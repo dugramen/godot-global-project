@@ -1,3 +1,21 @@
-[gd_scene format=3 uid="uid://bbr6u2kefuco4"]
+[gd_scene load_steps=2 format=3 uid="uid://bbr6u2kefuco4"]
+
+[sub_resource type="GDScript" id="GDScript_l8f1h"]
+script/source = "extends Node
+
+func _ready() -> void:
+	print('began')
+	
+	var counter := 0
+	var runner := func():
+		print(counter)
+		counter += 1
+	
+	runner.call()
+	runner.call()
+	runner.call()
+	print('final ', counter)
+"
 
 [node name="Node" type="Node"]
+script = SubResource("GDScript_l8f1h")

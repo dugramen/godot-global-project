@@ -60,9 +60,11 @@ func _init(path := "") -> void:
 					for c in class_map:
 						file.source_code += "\nvar %s = Engine.get_singleton('%s')" % [c, class_map[c]]
 					if file.reload() == OK:
-						var plugin: Object = file.new()
-						if plugin is EditorPlugin:
-							holder.add_child(plugin)
-						if plugin.has_method("_portable_path"):
-							plugin.call("_portable_path", path)
+						pass
+				for file in files:
+					var plugin: Object = file.new()
+					if plugin is EditorPlugin:
+						holder.add_child(plugin)
+					if plugin.has_method("_portable_path"):
+						plugin.call("_portable_path", path)
 		, CONNECT_ONE_SHOT)

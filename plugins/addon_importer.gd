@@ -1,10 +1,17 @@
 @tool
 
+class_name AddonImporter
+
 extends EditorPlugin
 
 var popup := PopupPanel.new()
+static var other := "soup other"
 
 func _portable_path(path := ""):
+	var ais = ArrInspect.new()
+	print(ais.pooch)
+	print(ArrInspect.stern)
+	
 	var main_vbox := VBoxContainer.new()
 	var scroll_container := ScrollContainer.new()
 	var panel_container := PanelContainer.new()
@@ -63,3 +70,6 @@ func _portable_path(path := ""):
 func _exit_tree() -> void:
 	remove_tool_menu_item("Addon Importer")
 	popup.queue_free()
+
+class Inner:
+	var something := "sometimes"
