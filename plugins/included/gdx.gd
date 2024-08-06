@@ -20,7 +20,7 @@ static func render(callable: Callable):
 	
 	return result
 
-static func recurse_tree(context: Callable, parent: Node, array: Array, node_index := 0):
+static func recurse_tree(context: Callable, parent: Node, array: Array, node_index := [0]):
 	#var instance: Object = parent
 	var node_class = [null]
 	var props := {}
@@ -33,20 +33,22 @@ static func recurse_tree(context: Callable, parent: Node, array: Array, node_ind
 		if node_class[0] is Node:
 			instance = node_class[0]
 		else:
-			if parent.get_child_count() > node_index:
+			if parent and parent.get_child_count() > node_index[0]:
 				var key: String = props.get('name', "")
 				if parent.has_node(key):
 					instance = parent.get_node(key)
 					should_create = false
 				else:
-					instance = parent.get_child(node_index)
+					instance = parent.get_child(node_index[0])
 					var existing_class = instance.get_meta("node_class", -10)
 					if existing_class == node_class[0]:
 						should_create = false
 			if should_create:
 				instance = node_class[0].new()
 				instance.set_meta("node_class", node_class[0])
-				parent.add_child(instance)
+				if parent:
+					parent.add_child(instance)
+		print(instance)
 		_deletion_map[context].erase(instance)
 		_new_deletion_map[context][instance] = true
 		
@@ -69,15 +71,18 @@ static func recurse_tree(context: Callable, parent: Node, array: Array, node_ind
 					if instance.get(key) != value:
 						instance.set(key, value)
 					continue
-		props.clear()
 		
-		recurse_tree(context, instance, children + [], node_index)
+		if children.size() > 0:
+			recurse_tree(context, instance, children, node_index + [])
+		
+		props.clear()
 		children.clear()
+		node_class[0] = null
 		return instance
 	
-	var index := -1
+	var index := 0
 	for item in array:
-		index += 1
+		print(index)
 		if item is Dictionary:
 			props.merge(item, true)
 		elif item is Callable:
@@ -87,14 +92,17 @@ static func recurse_tree(context: Callable, parent: Node, array: Array, node_ind
 		elif item is Node:
 			if index > 0:
 				seal_class.call()
-			node_index += 1
+			index += 1
+			node_index[0] += 1
 			node_class[0] = item
 		elif "new" in item:
 			# Process everything up til now before the new class
 			if index > 0:
+				print('sealing')
 				seal_class.call()
 			
-			node_index += 1
+			index += 1
+			node_index[0] += 1
 			node_class[0] = item
 	
 	return seal_class.call()
