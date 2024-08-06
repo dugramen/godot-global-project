@@ -24,37 +24,40 @@ func _init(path := "") -> void:
 				
 				var class_map := {}
 				var files: Array[GDScript] = []
-				var file_paths := DirAccess.get_files_at(path + "plugins")
-				for file_name in file_paths:
-					if !file_name.ends_with(".gd"):
-						continue
-					var file_path = path + "plugins/" + file_name
-					var source_code := FileAccess.get_file_as_string(file_path)
-					var file := GDScript.new()
-					file.source_code = source_code
-					files.push_back(file)
-					var cn_index_start = source_code.find("class_name")
-					if cn_index_start < 0:
-						continue
-					
-					var cn_index_end = cn_index_start + 10
-					if cn_index_end >= source_code.length():
-						continue
-					
-					var cn := ""
-					var i = cn_index_end
-					while cn.length() == 0 or cn.is_valid_identifier():
-						i += 1
-						cn += source_code[i]
-					cn = cn.trim_suffix("\n")
-					file.source_code = file.source_code.erase(cn_index_start, 11 + cn.length())
-					print("class_name:", cn)
-					
-					var singleton_name := "_p_" + cn
-					class_map[cn] = singleton_name
-					if Engine.has_singleton(singleton_name):
-						Engine.unregister_singleton(singleton_name)
-					Engine.register_singleton(singleton_name, file)
+				#var file_paths := DirAccess.get_files_at(path + "plugins")
+				var starting_path := path + "plugins/"
+				for dir in DirAccess.get_directories_at(starting_path):
+					for file_name in DirAccess.get_files_at(starting_path + dir):
+						if !file_name.ends_with(".gd"):
+							continue
+						var file_path = starting_path + dir + '/' + file_name
+						print(file_path)
+						var source_code := FileAccess.get_file_as_string(file_path)
+						var file := GDScript.new()
+						file.source_code = source_code
+						files.push_back(file)
+						var cn_index_start = source_code.find("class_name")
+						if cn_index_start < 0:
+							continue
+						
+						var cn_index_end = cn_index_start + 10
+						if cn_index_end >= source_code.length():
+							continue
+						
+						var cn := ""
+						var i = cn_index_end
+						while cn.length() == 0 or cn.is_valid_identifier():
+							i += 1
+							cn += source_code[i]
+						cn = cn.trim_suffix("\n")
+						file.source_code = file.source_code.erase(cn_index_start, 11 + cn.length())
+						print("class_name:", cn)
+						
+						var singleton_name := "_p_" + cn
+						class_map[cn] = singleton_name
+						if Engine.has_singleton(singleton_name):
+							Engine.unregister_singleton(singleton_name)
+						Engine.register_singleton(singleton_name, file)
 				
 				for file in files:
 					for c in class_map:
