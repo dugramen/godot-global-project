@@ -4,18 +4,50 @@
 script/source = "extends Control
 
 func _ready() -> void:
-	var child = GDX.render(func(a): return [
-		VBoxContainer, [
+	var st := {
+		counter = 0
+	}
+	var other_child = GDX.render(func(update): return [
+		VBoxContainer, {
+			on_tree_exiting = func():
+				print('exiting'),
+		}, [
 			[Button, {
-				text = \"Hello !\"
+				text = \"+ Add One\",
+				on_pressed = func():
+					st.counter += 1
+					update.call(),
 			}],
-			Button, {text = \"World\"},
-			Button, {
-				text = \"Wassup\"
-			},
+			[Label, { text = \"Counter: \" + str(st.counter) }],
+			
+			[range(st.counter).map(func(a): return [
+				[Button, {
+					text = str(a)
+				}]
+			])],
+			
+			[Label, {text = \"Greater than 3\"}] if st.counter > 3 else []
 		]
 	])
-	add_child(child)
+	var child = GDX.render(func(update): return [
+		VBoxContainer, [
+			Button, {
+				text = \"+ Add One\",
+				on_pressed = func():
+					st.counter += 1
+					update.call()
+					pass,
+			},
+			Label, {text = \"Finished \" + str(st.counter)}, [],
+			
+			#range(st.counter).map(func(a): return [
+				#Button, {
+					#text = str(a)
+				#}
+			#])
+		], 
+	])
+	add_child(other_child)
 	pass
 "
 
