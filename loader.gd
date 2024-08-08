@@ -1,18 +1,20 @@
 @tool
 
-var holder_name := "PortablePluginsHolder"
-static var loader_path := ""
+class_name Loader
 
-func _init(path := "") -> void:
-	loader_path = path.trim_suffix("loader.gd")
-	path = loader_path
-	print('running loader')
-	
+static var global_path := ""
+static var local_path := ""
+
+static func init_extensions(loader_path: String, this_file: GDScript) -> void:
+	#print('running loader')
+	return
 	var main_loop := Engine.get_main_loop()
 	if main_loop is SceneTree:
 		main_loop.process_frame.connect(func():
 			if Engine.is_editor_hint():
+				var path := loader_path.trim_suffix("loader.gd")
 				var base_control := EditorInterface.get_base_control()
+				var holder_name := "PortablePluginsHolder"
 				var holder = base_control.get_node_or_null(holder_name)
 				if holder:
 					for child in holder.get_children(true):
@@ -22,16 +24,22 @@ func _init(path := "") -> void:
 					base_control.add_child(holder)
 					holder.name = holder_name
 				
-				var class_map := {}
+				global_path = path
+				local_path = ProjectSettings.globalize_path("res://")
+				
+				var loader_name := "_gge_Loader"
+				var class_map := {"Loader" = loader_name}
+				if Engine.has_singleton(loader_name):
+					Engine.unregister_singleton(loader_name)
+				Engine.register_singleton(loader_name, this_file)
+				
 				var files: Array[GDScript] = []
-				#var file_paths := DirAccess.get_files_at(path + "plugins")
-				var starting_path := path + "plugins/"
+				var starting_path := path + "extensions/"
 				for dir in DirAccess.get_directories_at(starting_path):
 					for file_name in DirAccess.get_files_at(starting_path + dir):
 						if !file_name.ends_with(".gd"):
 							continue
 						var file_path = starting_path + dir + '/' + file_name
-						print(file_path)
 						var source_code := FileAccess.get_file_as_string(file_path)
 						var file := GDScript.new()
 						file.source_code = source_code
@@ -51,7 +59,6 @@ func _init(path := "") -> void:
 							cn += source_code[i]
 						cn = cn.trim_suffix("\n")
 						file.source_code = file.source_code.erase(cn_index_start, 11 + cn.length())
-						print("class_name:", cn)
 						
 						var singleton_name := "_p_" + cn
 						class_map[cn] = singleton_name
@@ -68,6 +75,4 @@ func _init(path := "") -> void:
 					var plugin: Object = file.new()
 					if plugin is EditorPlugin:
 						holder.add_child(plugin)
-					if plugin.has_method("_portable_path"):
-						plugin.call("_portable_path", path)
 		, CONNECT_ONE_SHOT)
