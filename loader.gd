@@ -4,10 +4,11 @@ class_name Loader
 
 static var global_path := ""
 static var local_path := ""
+static var editor_plugin_holder: Node = null
 
 static func init_extensions(loader_path: String, this_file: GDScript) -> void:
-	#print('running loader')
-	return
+	print('running loader')
+	#return
 	var main_loop := Engine.get_main_loop()
 	if main_loop is SceneTree:
 		main_loop.process_frame.connect(func():
@@ -15,14 +16,14 @@ static func init_extensions(loader_path: String, this_file: GDScript) -> void:
 				var path := loader_path.trim_suffix("loader.gd")
 				var base_control := EditorInterface.get_base_control()
 				var holder_name := "PortablePluginsHolder"
-				var holder = base_control.get_node_or_null(holder_name)
-				if holder:
-					for child in holder.get_children(true):
+				editor_plugin_holder = base_control.get_node_or_null(holder_name)
+				if editor_plugin_holder:
+					for child in editor_plugin_holder.get_children(true):
 						child.queue_free()
 				else:
-					holder = Node.new()
-					base_control.add_child(holder)
-					holder.name = holder_name
+					editor_plugin_holder = Node.new()
+					base_control.add_child(editor_plugin_holder)
+					editor_plugin_holder.name = holder_name
 				
 				global_path = path
 				local_path = ProjectSettings.globalize_path("res://")
@@ -74,5 +75,5 @@ static func init_extensions(loader_path: String, this_file: GDScript) -> void:
 				for file in files:
 					var plugin: Object = file.new()
 					if plugin is EditorPlugin:
-						holder.add_child(plugin)
+						editor_plugin_holder.add_child(plugin)
 		, CONNECT_ONE_SHOT)
