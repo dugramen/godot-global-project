@@ -99,6 +99,30 @@ Actually gets loaded as this:
 ## GDX
 This is the UI framework. This is specifically because extensions can't load most PackedScenes, due to subresource paths. So most of the time UI will need to be done in code. This is lightweight framework to make that a lot easier to do. It works similar to ReactJS (and gdx is a reference to react using jsx files)
 
+The inital render function is a bit boilerplate-y, but its pretty simple after that:
+```gdscript
+GDX.new().render(func(update): return (
+   # Tree of UI elements
+))
+```
+
+An element looks like this `[NodeType, { Properties }, [ Children ]]`. <br/>
+Example:
+```gdscript
+[HBoxContainer, [
+   [Button, {
+      text = "Click me!"
+   }]
+]]
+```
+This is the equivalent without gdx:
+```gdscript
+var hbox := HBoxContainer.new()
+var button := Button.new()
+hbox.add_child(button)
+button.text = "Click me!"
+```
+
 Here's a sample:
 ```gdscript
 var my_ui
