@@ -4,21 +4,10 @@ This is a framework for creating Global Extensions for the Godot Game Engine.
 ## Installation
 This is not an addon, but a project for you to keep on your system. All you need to do is open the project in godot, and a script will be injected into EditorSettings, that loads your extensions globally
 
-## Folder Structure
-```
-.
-├── addons                         # Traditional addons which can be imported into projects
-├── extensions                     # Editor Only extensions, that run globally inside the editor
-    ├── included                   # A few included extensions
-        ├── addon_importer.gd      # Opens a popup on new projects to import addons from addons folder
-        ├── gdx.gd                 # Ui Framework to make to make UIs in gdscript
-├── injector.gd                    # Injects a script into EditorSettings when this project is opened
-├── runner.gd                      # The script that gets injected. Very simple, just runs the loader script
-├── loader.gd                      # The loader script that loads extensions
-```
+## Overview
 - `Extensions:` These are Editor only extensions that run inside the Editor in every project
-- `Addons:` There's an included extension, `addon_importer`, for easily importing traditional addons into any project
-- `GDX:` Is an included UI framework for easily creating GUI from gdscript (more on that later)
+- `Addons:` There's an included extension, `addon_importer.gd`, for easily importing traditional addons into any project
+- `GDX:` Is an included UI framework for easily creating GUI from gdscript. It helps overcome loading limitations
 
 ## Differences from `globalize-plugins`
 Earlier I made an addon called `globalize-plugins`. It required you to install the addon into every project, which would then copy over a user-defined list of addons. `Global Extensions` succeeds that plugin:
@@ -106,3 +95,11 @@ Actually gets loaded as this:
 >    # Do this instead
 >    var my_path: String = Loader.global_path
 > ```
+
+## GDX
+This is the UI framework. This is specifically because extensions can't load most PackedScenes, due to subresource paths. So most of the time UI will need to be done in code. This is lightweight framework to make that a lot easier to do. It works similar to ReactJS (and gdx is a reference to react using jsx files)
+
+Here's a sample:
+```gdscript
+var my_ui
+```
