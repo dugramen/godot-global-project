@@ -99,11 +99,17 @@ func _enter_tree() -> void:
 						[MarginContainer, {
 							size_flags_horizontal = Control.SIZE_EXPAND_FILL,
 							size_flags_vertical = Control.SIZE_EXPAND_FILL,
+							theme_constant = {
+								margin_left = 8,
+								margin_right = 8,
+								margin_top = 8,
+								margin_bottom = 8
+							}
 						}, func(it: MarginContainer):
-							it.add_theme_constant_override("margin_left", 8)
-							it.add_theme_constant_override("margin_right", 8)
-							it.add_theme_constant_override("margin_top", 8)
-							it.add_theme_constant_override("margin_bottom", 8)
+							#it.add_theme_constant_override("margin_left", 8)
+							#it.add_theme_constant_override("margin_right", 8)
+							#it.add_theme_constant_override("margin_top", 8)
+							#it.add_theme_constant_override("margin_bottom", 8)
 							pass,
 						[
 							[VBoxContainer, [
@@ -128,14 +134,17 @@ func _enter_tree() -> void:
 					]]
 				]],
 				[HBoxContainer, {
-					alignment = HBoxContainer.ALIGNMENT_CENTER
+					alignment = HBoxContainer.ALIGNMENT_CENTER,
+					theme_constant = {
+						separation = 10
+					}
 				}, [
 					[Button, {
 						text = "Cancel",
 						on_pressed = func():
 							popup.hide()
 							pass,
-					}],
+					}], 
 					[Button, {
 						text = "(Re)import",
 						on_pressed = func():

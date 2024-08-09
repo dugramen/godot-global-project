@@ -11,6 +11,6 @@ static func _static_init() -> void:
 	settings.set_setting("portable_plugins/injected_script", new_scr)
 	new_scr.reload()                       
 				
-   
+	 
   
  

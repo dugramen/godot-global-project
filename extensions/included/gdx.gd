@@ -84,6 +84,10 @@ func build_element(callable: Callable, tree: Array, context := {node = null, ind
 						node.connect(signal_name, value)
 						connections[signal_name] = value
 					continue
+				if value is Control and key.begins_with("theme_") and value is Dictionary:
+					for p in value:
+						node.call("add_" + key + "_override", p, value[p])
+					continue
 				if key in node:
 					if node.get(key) != value:
 						node.set(key, value)
