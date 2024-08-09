@@ -1,7 +1,21 @@
 # Godot Global Extensions
 This is a framework for creating Global Extensions for the Godot Game Engine. 
 
+## Installation
 This is not an addon, but a project for you to keep on your system. All you need to do is open the project in godot, and a script will be injected into EditorSettings, that loads your extensions globally
+
+## Folder Structure
+```
+.
+├── addons                         # Traditional addons which can be imported into projects
+├── extensions                     # Editor Only extensions, that run globally inside the editor
+    ├── included                   # A few included extensions
+        ├── addon_importer.gd      # Opens a popup on new projects to import addons from addons folder
+        ├── gdx.gd                 # Ui Framework to make to make UIs in gdscript
+├── injector.gd                    # Injects a script into EditorSettings when this project is opened
+├── runner.gd                      # The script that gets injected. Very simple, just runs the loader script
+├── loader.gd                      # The loader script that loads extensions
+```
 - `Extensions:` These are Editor only extensions that run inside the Editor in every project
 - `Addons:` There's an included extension, `addon_importer`, for easily importing traditional addons into any project
 - `GDX:` Is an included UI framework for easily creating GUI from gdscript (more on that later)
