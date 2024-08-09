@@ -28,3 +28,23 @@ This is the main use case.
 Any resource with subresources / dependencies will fail to load, because those paths still use `res://`. So something like PackedScene will likely fail to load (this is what gdx is for)
 
 - `class_name`s are handled as a special case. If any of your extensions define a class_name, they will be available to other extensions, but NOT to the anything else in the project.
+   - I've achieved this in a weird way. Normally, if a script is just loaded, but not actually saved in the project's `res://` directory, it won't actually be available by its class_name. Since extensions scripts are only loaded, not saved, their `class_name` wouldn't be available
+   - The solution: Instead of loading extension scripts *directly*, it loads a duplicate `GDScript`.
+      The difference is this `GDScript`'s source code has extra static variables defined at the bottom, pointing to other script duplicates with `class_name` defined.
+  - This means all you have to do is define `class_name`, and that extension script will be available to other extensions scripts. `Loader`, `AddonImporter`, and `GDX` are all loaded in this way. So an extension script would be transformed as such
+     - Original:
+       ```gdscript
+       @tool
+       func _init():
+          print(Loader.global_path)
+       ```
+       Actual loaded script:
+       ```gdscript
+       @tool
+       func _init():
+          print(Loader.global_path)
+
+       static var Loader = Engine.get_singleton("_p_Loader")
+       static var AddonImporter = Engine.get_singleton("_p_AddonImporter")
+       static var GDX = Engine.get_singleton("_p_GDX")
+       ```
