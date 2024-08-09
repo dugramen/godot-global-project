@@ -30,7 +30,8 @@ Earlier I made an addon called `globalize-plugins`. It required you to install t
 First and foremost, extensions are \**Editor Only*\*, so they should have `@tool`. They will not be copied into the project. If you need something in your project, it should be an addon.
 
 Extensions are just scripts. They will be instantiated on load, so any functionality can be written in `_init()`. 
-If your extension extends from `EditorPlugin`, it will also be added to the root of the editor, and act as a normal EditorPlugin. In this case you can use `_enter_tree()` and `_exit_tree()` instead.
+If your extension extends from `EditorPlugin`, it will also be added to the root of the editor. From there they work just like normal [EditorPlugins](https://docs.godotengine.org/en/stable/classes/class_editorplugin.html#class-editorplugin). 
+So you can use `_enter_tree()` to initialize and `_exit_tree()` to cleanup.
 This is the main use case.
    - Example:
       ```gdscript
@@ -60,23 +61,17 @@ This is the main use case.
 
 
 ### class_name
-`class_name` is handled as a special case. If any of your extensions define a `class_name`, they will be available to other extensions, but NOT to the anything else in the project.
-   - I've achieved this in a weird way. Normally, if a script is just loaded, but not actually saved in the project's `res://` directory, it won't actually be available by its `class_name`. Since extensions scripts are only loaded, not saved, their `class_name` wouldn't be available either.
+`class_name` is handled in a special way. Normally, loading a script does not actually register the `class_name` globally. Only scripts saved in the actual project are available by their `class_name`. 
 
-My solution:
+To overcome this, extensions are handled differently. Instead of loading the script directly, a duplicate is loaded with extra static variables added to the bottom. These variables point to all the class_names of your extensions, letting you access them as if they were actually registered globally.
 
-Instead of loading extension scripts *directly*, a duplicate `GDScript` is loaded.
-The difference is this `GDScript`'s source code has extra static variables defined at the bottom, pointing to other script duplicates with `class_name` defined.
-
-This means all you have to do is define `class_name`, and that extension script will be available to other extensions scripts. `Loader`, `AddonImporter`, and `GDX` are all loaded in this way. So an extension script would be transformed as such.
-
-Original:
+For example this:
  ```gdscript
  @tool
  func _init():
     print(Loader.global_path)
  ```
-What the script becomes:
+Actually gets loaded as this:
  ```gdscript
  @tool
  func _init():
@@ -105,7 +100,7 @@ What the script becomes:
 > ```gdscript
 > @tool
 > func _init():
->    # Error. Used := but Loader is not a real class_name
+>    # Error. Used := but Loader is not a real class_name, so Godot can't infer it
 >    var my_path := Loader.global_path
 > 
 >    # Do this instead
