@@ -179,4 +179,24 @@ var ui = GDX.new().render(func(update): return (
    ]]
 ))
 ```
+Dynamic rendering can cause some nodes to be needlessly recreated. This is because nodes are tracked by their index in their parent. Rendering a dynamic list makes the index unreliable, so instead you can provide a name. Elements with a name provided can always be reused, since a node's name is not affected by index.
+
+If you ran the example above, you may have noticed that the LineEdit keeps unfocusing after submitting. This is because the node was being deleted and recreated. If you give it a name, it will be reused instead
+```gdscript
+var my_list := ["Hello", "There", "World"]
+var ui = GDX.new().render(func(update): return (
+   [VBoxContainer, [
+      my_list.map(func(item): return (
+         [Label, { text = item }]
+      )),
+      [LineEdit, {
+         name = "Text Input",
+         on_text_submitted = func(text):
+            my_list.append(text)
+            update.call()
+            pass,
+      }]
+   ]]
+))
+```
 
