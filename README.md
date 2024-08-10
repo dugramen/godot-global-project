@@ -76,7 +76,7 @@ Actually gets loaded as this:
  ```
 
 > [!CAUTION]
-> Because these are not real `class_name`s, Godot cannot infer their types, so avoide using `:=` with them. <br/>
+> Because these are not real `class_name`s, Godot cannot infer their types, so avoid using `:=` with them. <br/>
 > They are also not available in top level variables, only in functions, because the static variables haven't initialized yet.<br/>
 > So the following examples will error:
 > ```gdscript
@@ -279,9 +279,7 @@ You can even avoid adding the rendered UI to the tree like this, by just directl
 You can do all the same things to a raw node, like setting props, callables, and children.
 ```gdscript
 GDX.new().render(func(update): return (
-	[self, func(it: Control):
-		it.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT),
-	[
+	[self, { "self_modulate:a" = 0.8 }, [
 		[VBoxContainer, [
 			[HBoxContainer, [
 				[Button]
