@@ -132,6 +132,32 @@ Example:
 ```
 > Godot's function syntax is pretty annoying here. For some reason it complains unless that last comma is there
 
+### Theme Properties
+Control nodes have various theme properties that are only editable using methods like `add_theme_color_override`. <br/>
+To customize theme properties in gdx, you can use special `theme_` props instead.
+```gdscript
+[Button, {
+   theme_constant = {
+      outline_size = 1
+   },
+   theme_color = {
+      font_color = Color.RED
+   },
+   theme_font = {
+      font = Font.new()
+   },
+   theme_font_size = {
+      font_size = 20
+   },
+   theme_icon = {
+      icon = Icon.new()
+   },
+   theme_stylebox = {
+      normal = StyleBoxEmpty.new()
+   }
+}]
+```
+
 ### Rerender
 The render function is passed a callback, which rerenders the UI. A rerender just calls the function again. <br/>
 As it goes down the tree, it will avoid recreating new nodes, and instead reuse nodes from the previous render where possible.
