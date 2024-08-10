@@ -77,6 +77,7 @@ func build_element(callable: Callable, tree: Array, context := {node = null, ind
 		# Handle props
 		for key in props:
 			var value = props[key]
+			#prints(key, node, value)
 			if key is String:
 				if key.begins_with("on_"):
 					var signal_name: String = key.trim_prefix("on_")
@@ -84,14 +85,28 @@ func build_element(callable: Callable, tree: Array, context := {node = null, ind
 						node.connect(signal_name, value)
 						connections[signal_name] = value
 					continue
-				if value is Control and key.begins_with("theme_") and value is Dictionary:
+				if node is Control and key.begins_with("theme_") and value is Dictionary:
 					for p in value:
 						node.call("add_" + key + "_override", p, value[p])
 					continue
 				if key in node:
 					if node.get(key) != value:
 						node.set(key, value)
+						continue
 					continue
+					
+				var indexed_val = node.get_indexed(key)
+				if typeof(indexed_val) == typeof(value):
+					#print('proped')
+					if node.get_indexed(key) != value:
+						node.set_indexed(key, value)
+						continue
+					continue
+				else:
+					push_error(key, " not found on ", node)
+					#prints('key ', key)
+					#print('indexed ', indexed_val)
+					#print('value ', value)
 		
 		for c in calls:
 			c.call(node)

@@ -4,134 +4,56 @@
 script/source = "extends Control
 
 func _ready() -> void:
-	var st := {
-		counter = 0
-	}
-	var addons := []
-	#var addon_nodes := []
-	var addon_panel = GDX.render(func(update): return(
-		[MarginContainer, [
-			[PanelContainer, [
-				[VBoxContainer, [
-					[CheckBox, {
-						text = \"All\",
-						on_toggled = func(val):
-							for a in addons:
-								a.checked = val
-								update.call()
-							pass,
-					}],
-					[ScrollContainer, {
-						custom_minimum_size = Vector2(200, 200),
-						horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-					}, [
-						[MarginContainer, [
-							[Panel, func(it: Panel): it.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)],
-							[VBoxContainer, [
-								addons.map(func(a): return [
-									[HBoxContainer, {
-										name = a.name
-									}, [
-										[CheckBox, {
-											text = a.text,
-											button_pressed = a.checked,
-											on_toggled = func(val):
-												a.checked = val
-												update.call(),
-										}],
-										[LineEdit, {
-											expand_to_text_length = true,
-											text = a.text,
-											on_text_changed = func(t):
-												a.text = t
-												update.call()
-												pass,
-										}],
-										[Button, {
-											text = \"Delete\",
-											on_pressed = func():
-												addons.erase(a)
-												update.call()
-												pass,
-										}]
-									]]
-								])
-							]]
-						]],
-					]],
-					[HBoxContainer, [
-						[Button, {
-							text = \"Cancel\",
-							on_pressed = func():
-								addons.push_back({
-									name = str(Time.get_ticks_usec() + randf()),
-									checked = false,
-									text = \"Empty\",
-								})
-								update.call(),
-						}],
-						[Button, {
-							text = \"(Re)import\"
-						}]
-					]]
-				]]
-			]]
+	var my_list := [\"Hello\", \"There\", \"World\"]
+	var ui = GDX.new().render(func(update): return (
+		[VBoxContainer, [
+			my_list.map(func(item): return (
+				[Label, { text = item }]
+			)),
+			[LineEdit, {
+				name = \"LineEdit\",
+				text = \"\",
+				on_text_submitted = func(text):
+					my_list.append(text)
+					update.call()
+					pass,
+			}]
 		]]
 	))
-	
-	add_child(
-	GDX.render(func(update): return (
-		[VBoxContainer, [
-				[CheckBox, {
-					text = \"(All)\",
-					on_toggled = func(v):
-						for a in addons:
-							a.checked = v
-						update.call()
-						pass,
-				}],
-				[ScrollContainer, {
-					custom_minimum_size = Vector2(200, 200),
-					horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-				}, [
-					
-					[MarginContainer, {
-						size_flags_vertical = Control.SIZE_EXPAND_FILL,
-						size_flags_horizontal = Control.SIZE_EXPAND_FILL,
-					}, func(it: MarginContainer):
-						it.add_theme_constant_override(\"margin_left\", 8)
-						pass,
-					[
-						[Panel],
-						[VBoxContainer, [
-							addons.map(func(a): return (
-								[CheckBox, {
-									text = a.text,
-									button_pressed = a.checked,
-									on_toggled = func(v):
-										a.checked = v
-										update.call()
-										pass,
-								}]
-							))
-						]]
-					]]
-				]],
-				[HBoxContainer, [
-					[Button, {
-						text = \"Cancel\",
-					}],
-					[Button, {
-						text = \"(Re)import\",
+	#var st := {
+		#counter = 0
+	#}
+	#var my_ui = GDX.new().render(func(rerender): return (
+		#[self, func(it: Control): 
+			#print(it)
+			#it.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT), [
+			#[MarginContainer, [
+				#[VBoxContainer, [
+					#[Label, {
+						#text = \"Welcome to my UI\",
+						#theme_font_size = {
+							#font_size = 40
+						#},
+					#}],
+					#[Label, {
+						#text = \"Current count: \" + str(st.counter),
+						#theme_font_size = {
+							#font_size = 16
+						#},
+						#\"modulate:a\" = .5,
+					#}],
+					#[Button, {
+						#text = \"+ Increment\",
 						#on_pressed = func():
-							#popup.hide()
+							#st.counter += 1
+							#rerender.call()
 							#pass,
-					}]
-				]]
-			]]
-	))
-	)
-	pass
+					#}]
+				#]]
+			#]]
+		#]]
+	#))
+	add_child(ui)
 "
 
 [node name="Node" type="Control"]

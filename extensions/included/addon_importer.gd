@@ -4,7 +4,6 @@ class_name AddonImporter
 
 extends EditorPlugin
 
-
 func copy_addons(addons: Array):
 	var plugin_folders_to_enable := []
 	for addon in addons:

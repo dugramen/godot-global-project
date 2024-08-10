@@ -14,7 +14,7 @@ show_on_startup=false
 
 [application]
 
-config/name="portable-plugins"
+config/name="global-extensions"
 run/main_scene="res://node.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 config/icon="res://icon.svg"
