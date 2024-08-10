@@ -23,17 +23,17 @@ Extensions are just scripts. They will be instantiated on load, so any functiona
 If your extension extends from `EditorPlugin`, it will also be added to the root of the editor. From there they work just like normal [EditorPlugins](https://docs.godotengine.org/en/stable/classes/class_editorplugin.html#class-editorplugin). 
 So you can use `_enter_tree()` to initialize and `_exit_tree()` to cleanup.
 This is the main use case.
-   - Example:
-      ```gdscript
-      @tool
-      extends EditorPlugin
-      
-      func _enter_tree():
-      	add_tool_menu_item("Test", func(): print("Hello!"))
-      
-      func _exit_tree():
-      	remove_tool_menu_item("Test")
-      ```
+Example:
+```gdscript
+@tool
+extends EditorPlugin
+
+func _enter_tree():
+	add_tool_menu_item("Test", func(): print("Hello!"))
+
+func _exit_tree():
+	remove_tool_menu_item("Test")
+```
 > [!WARNING]
 > Extensions are loaded from a different directory than your current project. So you cannot use `res://` paths to load anything outside the project, you have to use absolute paths. 
 > 
