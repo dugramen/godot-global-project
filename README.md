@@ -19,7 +19,9 @@ Earlier this year I made an addon called `globalize-plugins`. It required you to
 ## Making Extensions
 First and foremost, extensions are \**Editor Only*\*, so they should have `@tool`. They will not be copied into the project. If you need something included in your project, it should be an addon.
 
-Extensions are just scripts. They will be instantiated on load, so any functionality can be written in `_init()`. 
+Extensions are just scripts in the `extensions` folder. They must be in a subfolder, like `extensions/my_extension/my_script.gd`. If they are directly in the `extensions` folder they will not load. Also, if they are in a nested subfolder, like `extensions/my_extension/subfoler/my_script.gd`, they will also not load by default. For those, you should manually load them (more info in [Loading Resources](#loading-resources))
+
+They will be instantiated on load, so any functionality can be written in `_init()`. 
 If your extension extends from `EditorPlugin`, it will also be added to the root of the editor. From there they work just like normal [EditorPlugins](https://docs.godotengine.org/en/stable/classes/class_editorplugin.html#class-editorplugin). 
 So you can use `_enter_tree()` to initialize and `_exit_tree()` to cleanup.
 This is the main use case.
@@ -34,6 +36,7 @@ func _enter_tree():
 func _exit_tree():
 	remove_tool_menu_item("Test")
 ```
+### Loading Resources
 > [!WARNING]
 > Extensions are loaded from a different directory than your current project. So you cannot use `res://` paths to load anything outside the project, you have to use absolute paths. 
 > 
