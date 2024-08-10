@@ -48,9 +48,7 @@ func copy_addons(addons: Array):
 	var pop := PopupPanel.new()
 	GDX.new().render(func(a): return (
 		[self, [
-			[pop, {
-				popup_window = false
-			}, [
+			[pop, { popup_window = false }, [
 				[Label, {
 					text = "Enabling addons..."
 				}]
