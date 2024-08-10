@@ -44,6 +44,14 @@ func build_element(callable: Callable, tree: Array, context := {node = null, ind
 		var node: Node = null
 		if tree[0] is Node:
 			node = tree[0]
+			if parent:
+				var node_parent = node.get_parent()
+				var i = context.index
+				if node_parent == null:
+					parent.add_child(node)
+				elif node_parent != parent:
+					node.reparent(parent)
+				parent.move_child(node, i)
 		else:
 			var should_create := true
 			if parent:
@@ -51,7 +59,7 @@ func build_element(callable: Callable, tree: Array, context := {node = null, ind
 				if parent.has_node(key):
 					node = parent.get_node(key)
 					var i = context.index
-					parent.move_child.call_deferred(node, i)
+					parent.move_child(node, i)
 					should_create = false
 				elif parent.get_child_count() > context.index:
 					node = parent.get_child(context.index)
@@ -62,7 +70,7 @@ func build_element(callable: Callable, tree: Array, context := {node = null, ind
 				node = tree[0].new()
 				node.set_meta("node_class", tree[0])
 				if parent:
-					parent.add_child.call_deferred(node)
+					parent.add_child(node)
 		_deletion_map[callable].erase(node)
 		_new_deletion_map[callable][node] = true
 		

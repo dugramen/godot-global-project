@@ -45,22 +45,20 @@ func copy_addons(addons: Array):
 		
 	# The FileSystem dock doesn't properly scan new files if scanned immediately
 	#rfs.scan()
-	var p := PopupPanel.new()
-	#add_child(p)
-	#var label := Label.new()
-	#p.add_child(label)
-	#label.text = "Enabling"
+	var pop := PopupPanel.new()
 	GDX.new().render(func(a): return (
 		[self, [
-			[p, [
+			[pop, {
+				popup_window = false
+			}, [
 				[Label, {
-					text = "Enabling " + "..."
+					text = "Enabling addons..."
 				}]
 			]]
 		]]
 	))
 	
-	p.popup_centered()
+	pop.popup_centered()
 	
 	rfs.scan_sources()
 	print("begin scan")
@@ -72,8 +70,8 @@ func copy_addons(addons: Array):
 	
 	for folder in plugin_folders_to_enable:
 		EditorInterface.set_plugin_enabled(folder, true)
-	p.hide()
-	p.queue_free()
+	pop.hide()
+	pop.queue_free()
 
 
 func _enter_tree() -> void:
