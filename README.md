@@ -123,6 +123,17 @@ Example:
 ]]
 ```
 
+### Nested Properties
+Some property values have nested properties, like Color or Vector2. You can set those too like you would with a NodePath. And they can edit previously set props.
+```gdscript
+[Label, {
+	text = "My Text!",
+	custom_minimum_size = Vector2(0, 0),
+	'custom_minimum_size:y' = 100,
+	'modulate:a' = 0.5,
+}]
+```
+
 ### Signals
 A signal connection is just a prop with "on_" followed by the signal name. <br/>
 Example:
