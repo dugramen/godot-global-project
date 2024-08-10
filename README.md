@@ -101,7 +101,7 @@ Actually gets loaded as this:
 > ```
 
 ## GDX
-This is the UI framework. This exists specifically because extensions can't load most PackedScenes, due to subresource paths. So most of the time UI will need to be done in code. This is a lightweight framework to make that a lot easier to do. It works similar to ReactJS (and gdx is a reference to react using jsx files)
+This is the UI framework. This exists specifically because extensions can't load most PackedScenes, due to subresource paths. So most of the time UI will need to be done in code. This is a lightweight framework to make that a lot easier to do. It works similar to ReactJS (gdx is a reference to jsx files)
 
 ### Render
 The inital render function is a bit boilerplate-y, but its pretty simple after that:
