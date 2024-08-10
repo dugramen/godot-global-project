@@ -5,19 +5,21 @@ script/source = "extends Control
 
 func _ready() -> void:
 	var my_list := [\"Hello\", \"There\", \"World\"]
-	var ui = GDX.new().render(func(update): return (
-		[VBoxContainer, [
-			my_list.map(func(item): return (
-				[Label, { text = item }]
-			)),
-			[LineEdit, {
-				name = \"LineEdit\",
-				text = \"\",
-				on_text_submitted = func(text):
-					my_list.append(text)
-					update.call()
-					pass,
-			}]
+	GDX.new().render(func(update): return (
+		[self, [
+			[VBoxContainer, [
+				my_list.map(func(item): return (
+					[Label, { text = item }]
+				)),
+				[LineEdit, {
+					name = \"LineEdit\",
+					text = \"\",
+					on_text_submitted = func(text):
+						my_list.append(text)
+						update.call()
+						pass,
+				}]
+			]]
 		]]
 	))
 	#var st := {
@@ -53,7 +55,6 @@ func _ready() -> void:
 			#]]
 		#]]
 	#))
-	add_child(ui)
 "
 
 [node name="Node" type="Control"]
