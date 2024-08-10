@@ -277,4 +277,16 @@ GDX.new().render(func(update): return (
 ))
 ```
 
+## Troubleshooting
+### Editor Crash
+Since extensions load alongside the editor, if one of them is bugged, the editor may crash.
+
+Just move the bugged extensions outside of the `extensions` folder.
+
+If the editor still crashes, there may be an error in my `loader.gd` script. In that case, move or rename `loader.gd` to something else, like `_loader.gd`. And please report the issue.
+
+If that doesn't work, there may be an error in my `runner.gd` script, which is injected into EditorSettings. This is very unlikely due to how simple the script is, but just in case, this requires you to locate your EditorSettings file. Check [here](https://docs.godotengine.org/en/stable/tutorials/io/data_paths.html#editor-data-paths) for its location. Open the `editor_settings-4.3` (or whichever verion) file in a text editor and erase the script. It'll look something like this, just erase the whole chunk:
+![image](https://github.com/user-attachments/assets/31cadeda-d22d-48d5-ad65-9b410cb96b5d)
+
+If you don't know how to open it in a text editor, or are too scared to make changes, just delete the whole `editor_settings-4.x` file, and godot will recreate it when it next loads.
 
