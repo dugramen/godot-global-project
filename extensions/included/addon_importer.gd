@@ -6,6 +6,9 @@ extends EditorPlugin
 
 func copy_addons(addons: Array):
 	var plugin_folders_to_enable := []
+	var files_to_reimport := []
+	var rfs := EditorInterface.get_resource_filesystem()
+	
 	for addon in addons:
 		
 		if addon is not String:
@@ -31,6 +34,8 @@ func copy_addons(addons: Array):
 			
 			for file in DirAccess.get_files_at(global_path):
 				DirAccess.copy_absolute(global_path + '/' + file, local_path + '/' + file)
+				#files_to_reimport.push_back(local_path + "/" + file)
+				
 			for d in DirAccess.get_directories_at(global_path):
 				dirs.append(dir + '/' + d)
 			i += 1
@@ -39,16 +44,36 @@ func copy_addons(addons: Array):
 				plugin_folders_to_enable.push_back(addon)
 		
 	# The FileSystem dock doesn't properly scan new files if scanned immediately
-	var rfs := EditorInterface.get_resource_filesystem()
-	await get_tree().process_frame
-	rfs.scan()
+	#rfs.scan()
+	var p := PopupPanel.new()
+	#add_child(p)
+	#var label := Label.new()
+	#p.add_child(label)
+	#label.text = "Enabling"
+	GDX.new().render(func(a): return (
+		[self, [
+			[p, [
+				[Label, {
+					text = "Enabling " + "..."
+				}]
+			]]
+		]]
+	))
 	
+	p.popup_centered()
+	
+	rfs.scan_sources()
+	print("begin scan")
 	while rfs.is_scanning():
+		print('is scanning')
 		await get_tree().process_frame
 	await get_tree().process_frame
+	print("end scan")
 	
 	for folder in plugin_folders_to_enable:
 		EditorInterface.set_plugin_enabled(folder, true)
+	p.hide()
+	p.queue_free()
 
 
 func _enter_tree() -> void:

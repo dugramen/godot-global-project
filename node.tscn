@@ -4,24 +4,40 @@
 script/source = "extends Control
 
 func _ready() -> void:
-	var my_list := [\"Hello\", \"There\", \"World\"]
-	GDX.new().render(func(update): return (
-		[self, [
-			[VBoxContainer, [
-				my_list.map(func(item): return (
-					[Label, { text = item }]
-				)),
-				[LineEdit, {
-					name = \"LineEdit\",
-					text = \"\",
-					on_text_submitted = func(text):
-						my_list.append(text)
-						update.call()
-						pass,
-				}]
+	var margin := MarginContainer.new()
+	var vbox := VBoxContainer.new()
+	var button := Button.new()
+	var ui = GDX.new().render(func(update): return (
+		[margin, [
+			[MarginContainer, [
+				[VBoxContainer, [
+					[button, {text = \"hi\"}],
+					[Button, {text = \"hi\"}],
+					[Button, {text = \"hi\"}],
+					[Button, {text = \"hi\"}],
+				]]
 			]]
 		]]
 	))
+	add_child(ui)
+	#var my_list := [\"Hello\", \"There\", \"World\"]
+	#GDX.new().render(func(update): return (
+		#[self, [
+			#[VBoxContainer, [
+				#my_list.map(func(item): return (
+					#[Label, { text = item }]
+				#)),
+				#[LineEdit, {
+					#name = \"LineEdit\",
+					#text = \"\",
+					#on_text_submitted = func(text):
+						#my_list.append(text)
+						#update.call()
+						#pass,
+				#}]
+			#]]
+		#]]
+	#))
 	#var st := {
 		#counter = 0
 	#}
