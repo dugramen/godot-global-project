@@ -103,13 +103,14 @@ This is the UI framework. This exists specifically because extensions can't load
 ### Render
 The inital render function is a bit boilerplate-y, but its pretty simple after that:
 ```gdscript
-GDX.new().render(func(update): return (
+var ui = GDX.new().render(func(update): return (
    # Tree of UI elements
 ))
+add_child(ui)
 ```
 
 ### Structure
-An element structure looks like this `[NodeType, { Properties }, [ Children ]]`. <br/>
+An element structure is an array that looks like this `[NodeType, { Properties }, [ Children ]]`. <br/>
 Example:
 ```gdscript
 [HBoxContainer, [
@@ -225,4 +226,55 @@ var ui = GDX.new().render(func(update): return (
    ]]
 ))
 ```
+
+### Callables in element
+Sometimes you just need access to the node, and do some direct calls on it. For these cases, you can also put a callable in an element's array
+```gdscript
+[OptionButton, func(it: OptionButton):
+   it.add_item("First")
+   it.add_item("Second")
+   it.add_item("Third")
+]
+```
+
+### Access element outside of render
+Sometimes you also need access to an element outside of the render function. There are 2 ways of doing this. <br/>
+The first is using a "state" and a callable like in the previous example.
+```gdscript
+var st := {
+   my_button = null
+}
+var ui = GDX.new().render(func(update): return (
+   [MarginContainer, [
+      [Button, func(it: Button): st.my_button = it]
+   ]]
+))
+my_button.text = "Some text"
+```
+The second way creates the node outside of the render function, and just includes it as an element
+```gdscript
+var my_button := Button.new()
+var ui = GDX.new().render(func(update): return (
+   [MarginContainer, [
+      [my_button]
+   ]]
+))
+my_button.text = "Some text"
+```
+You can even avoid adding the rendered UI to the tree like this, by just directly including the parent node in the render. <br/>
+You can do all the same things to a raw node, like setting props, callables, and children.
+```gdscript
+GDX.new().render(func(update): return (
+   [self, func(it: Control):
+      it.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT),
+   [
+      [VBoxContainer, [
+         [HBoxContainer, [
+            [Button]
+         ]]
+      ]]
+   ]]
+))
+```
+
 
