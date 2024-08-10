@@ -2,21 +2,22 @@
 This is a framework for creating Global Extensions for the Godot Game Engine. 
 
 ## Installation
-This is not an addon, but a project for you to keep on your system. All you need to do is open the project in godot, and a script will be injected into EditorSettings, that loads your extensions globally
+This is not an addon, but a project for you to keep on your system. All you need to do is open this project in godot, and a script will be injected into EditorSettings. <br/>
+Your extensions are then global, loaded by that script every time you open Godot
 
 ## Overview
-- `Extensions:` These are Editor only extensions that run inside the Editor in every project
-- `Addons:` There's an included extension, `addon_importer.gd`, for easily importing traditional addons into any project
-- `GDX:` Is an included UI framework for easily creating GUI from gdscript. It helps overcome loading limitations
+- `Extensions:` These are Editor only extensions that automatically run inside the Editor in every project
+- `Addons:` These are traditional addons. `addon_importer` is an included extension that asks which addons to import when first opening a project
+- `GDX:` Is an included UI framework for easily creating GUI from gdscript. It helps overcome some loading limitations
 
 ## Differences from `globalize-plugins`
-Earlier I made an addon called `globalize-plugins`. It required you to install the addon into every project, which would then copy over a user-defined list of addons. `Global Extensions` succeeds that plugin:
+Earlier this year I made an addon called `globalize-plugins`. It required you to install the addon into every project, which would then copy over a user-defined list of addons. `Global Extensions` succeeds that plugin. Now:
 - `Extensions` are truly global, and will run in every project wihtout the user needing to install / enable anything. They are also loaded from the disk instead of copied over, making them \**Editor Only*\*
 - `Addons` work similarly to `globalize-plugins`, except that they are only copied over from this `/adddons` directory.
    - When you open a new project project, you will be shown a prompt asking which addons you want to import. This will appear once per project, but can be accessed again from `Project > Tools > Addon Importer`
 
 ## Making Extensions
-First and foremost, extensions are \**Editor Only*\*, so they should have `@tool`. They will not be copied into the project. If you need something in your project, it should be an addon.
+First and foremost, extensions are \**Editor Only*\*, so they should have `@tool`. They will not be copied into the project. If you need something included in your project, it should be an addon.
 
 Extensions are just scripts. They will be instantiated on load, so any functionality can be written in `_init()`. 
 If your extension extends from `EditorPlugin`, it will also be added to the root of the editor. From there they work just like normal [EditorPlugins](https://docs.godotengine.org/en/stable/classes/class_editorplugin.html#class-editorplugin). 
@@ -52,7 +53,7 @@ This is the main use case.
 ### class_name
 `class_name` is handled in a special way. Normally, loading a script does not actually register the `class_name` globally. Only scripts saved in the actual project are available by their `class_name`. 
 
-To overcome this, extensions are handled differently. Instead of loading the script directly, a duplicate is loaded with extra static variables added to the bottom. These variables point to all the class_names of your extensions, letting you access them as if they were actually registered globally.
+To overcome this, extensions are handled differently. Instead of loading the script directly, a duplicate is loaded with extra static variables added to the bottom. These variables point to all the class_names of your extensions, letting you access them almost as if they were actually registered globally.
 
 For example this:
  ```gdscript
@@ -97,8 +98,9 @@ Actually gets loaded as this:
 > ```
 
 ## GDX
-This is the UI framework. This is specifically because extensions can't load most PackedScenes, due to subresource paths. So most of the time UI will need to be done in code. This is lightweight framework to make that a lot easier to do. It works similar to ReactJS (and gdx is a reference to react using jsx files)
+This is the UI framework. This exists specifically because extensions can't load most PackedScenes, due to subresource paths. So most of the time UI will need to be done in code. This is a lightweight framework to make that a lot easier to do. It works similar to ReactJS (and gdx is a reference to react using jsx files)
 
+### Render
 The inital render function is a bit boilerplate-y, but its pretty simple after that:
 ```gdscript
 GDX.new().render(func(update): return (
@@ -106,7 +108,8 @@ GDX.new().render(func(update): return (
 ))
 ```
 
-An element looks like this `[NodeType, { Properties }, [ Children ]]`. <br/>
+### Structure
+An element structure looks like this `[NodeType, { Properties }, [ Children ]]`. <br/>
 Example:
 ```gdscript
 [HBoxContainer, [
@@ -115,15 +118,65 @@ Example:
    }]
 ]]
 ```
-This is the equivalent without gdx:
+
+### Signals
+A signal connection is just a prop with "on_" followed by the signal name. <br/>
+Example:
 ```gdscript
-var hbox := HBoxContainer.new()
-var button := Button.new()
-hbox.add_child(button)
-button.text = "Click me!"
+[Button, {
+   text = "Click me!",
+   on_pressed = func():
+      print("You clicked me!")
+      pass,
+}]
+```
+> Godot's function syntax is pretty annoying here. For some reason it complains unless that last comma is there
+
+### Rerender
+The render function is passed a callback, which rerenders the UI. A rerender just calls the function again. <br/>
+As it goes down the tree, it will avoid recreating new nodes, and instead reuse nodes from the previous render where possible.
+<br/>
+Example:
+```gdscript
+GDX.new().render(func(update): return (
+   [Button, {
+      on_pressed = func():
+         update.call(),   # rerenders the UI
+   }]
+))
 ```
 
-Here's a sample:
+### State
+For the sake of simplicity, state isn't anything special. Rather you just store variables in some reference type, like Dictionay, Array, or an Object. Then to update state, you set the variable and call the update / rerender callback. <br/>
+Here's a simple counter:
 ```gdscript
-var my_ui
+var st := { counter = 0 }
+var my_ui = GDX.new().render(func(update): return (
+   [Button, {
+      text = "Count: " + str(st.counter)
+      on_pressed = func():
+         st.counter += 1
+         update.call(),
+   }]
+))
 ```
+
+### List Rendering / Dynamic Rendering
+Just map an array into elements
+```gdscript
+var my_list := ["Hello", "There", "World"]
+var ui = GDX.new().render(func(update): return (
+   [VBoxContainer, [
+      my_list.map(func(item): return (
+         [Label, { text = item }]
+      )),
+      [LineEdit, {
+         on_text_submitted = func(text):
+            my_list.append(text)
+            update.call()
+            pass,
+      }]
+   ]]
+))
+```
+
