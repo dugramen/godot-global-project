@@ -29,10 +29,10 @@ This is the main use case.
       extends EditorPlugin
       
       func _enter_tree():
-         add_tool_menu_item("Test", func(): print("Hello!"))
+      	add_tool_menu_item("Test", func(): print("Hello!"))
       
       func _exit_tree():
-         remove_tool_menu_item("Test")
+      	remove_tool_menu_item("Test")
       ```
 > [!WARNING]
 > Extensions are loaded from a different directory than your current project. So you cannot use `res://` paths to load anything outside the project, you have to use absolute paths. 
@@ -59,13 +59,13 @@ For example this:
  ```gdscript
  @tool
  func _init():
-    print(Loader.global_path)
+ 	print(Loader.global_path)
  ```
 Actually gets loaded as this:
  ```gdscript
  @tool
  func _init():
-    print(Loader.global_path)
+ 	print(Loader.global_path)
 
  static var Loader = Engine.get_singleton("_p_Loader")
  static var AddonImporter = Engine.get_singleton("_p_AddonImporter")
@@ -85,16 +85,16 @@ Actually gets loaded as this:
 > var my_path
 > 
 > func _init():
->    my_path = Loader.global_path
+> 	my_path = Loader.global_path
 > ```
 > ```gdscript
 > @tool
 > func _init():
->    # Error. Used := but Loader is not a real class_name, so Godot can't infer it
->    var my_path := Loader.global_path
+> 	# Error. Used := but Loader is not a real class_name, so Godot can't infer it
+> 	var my_path := Loader.global_path
 > 
->    # Do this instead
->    var my_path: String = Loader.global_path
+> 	# Do this instead
+> 	var my_path: String = Loader.global_path
 > ```
 
 ## GDX
@@ -104,7 +104,7 @@ This is the UI framework. This exists specifically because extensions can't load
 The inital render function is a bit boilerplate-y, but its pretty simple after that:
 ```gdscript
 var ui = GDX.new().render(func(update): return (
-   # Tree of UI elements
+	# Tree of UI elements
 ))
 add_child(ui)
 ```
@@ -114,9 +114,9 @@ An element structure is an array that looks like this `[NodeType, { Properties }
 Example:
 ```gdscript
 [HBoxContainer, [
-   [Button, {
-      text = "Click me!"
-   }]
+	[Button, {
+		text = "Click me!"
+	}]
 ]]
 ```
 
@@ -125,10 +125,10 @@ A signal connection is just a prop with "on_" followed by the signal name. <br/>
 Example:
 ```gdscript
 [Button, {
-   text = "Click me!",
-   on_pressed = func():
-      print("You clicked me!")
-      pass,
+	text = "Click me!",
+	on_pressed = func():
+		print("You clicked me!")
+		pass,
 }]
 ```
 > Godot's function syntax is pretty annoying here. For some reason it complains unless that last comma is there
@@ -138,24 +138,24 @@ Control nodes have various theme properties that are only editable using methods
 To customize theme properties in gdx, you can use special `theme_` props instead.
 ```gdscript
 [Button, {
-   theme_constant = {
-      outline_size = 1
-   },
-   theme_color = {
-      font_color = Color.RED
-   },
-   theme_font = {
-      font = Font.new()
-   },
-   theme_font_size = {
-      font_size = 20
-   },
-   theme_icon = {
-      icon = Icon.new()
-   },
-   theme_stylebox = {
-      normal = StyleBoxEmpty.new()
-   }
+	theme_constant = {
+		outline_size = 1
+	},
+	theme_color = {
+		font_color = Color.RED
+	},
+	theme_font = {
+		font = Font.new()
+	},
+	theme_font_size = {
+		font_size = 20
+	},
+	theme_icon = {
+		icon = Icon.new()
+	},
+	theme_stylebox = {
+		normal = StyleBoxEmpty.new()
+	}
 }]
 ```
 
@@ -166,10 +166,10 @@ As it goes down the tree, it will avoid recreating new nodes, and instead reuse 
 Example:
 ```gdscript
 GDX.new().render(func(update): return (
-   [Button, {
-      on_pressed = func():
-         update.call(),   # rerenders the UI
-   }]
+	[Button, {
+		on_pressed = func():
+			update.call(),   # rerenders the UI
+	}]
 ))
 ```
 
@@ -179,12 +179,12 @@ Here's a simple counter:
 ```gdscript
 var st := { counter = 0 }
 var my_ui = GDX.new().render(func(update): return (
-   [Button, {
-      text = "Count: " + str(st.counter)
-      on_pressed = func():
-         st.counter += 1
-         update.call(),
-   }]
+	[Button, {
+		text = "Count: " + str(st.counter)
+		on_pressed = func():
+			st.counter += 1
+			update.call(),
+	}]
 ))
 ```
 
@@ -193,17 +193,17 @@ Just map an array into elements
 ```gdscript
 var my_list := ["Hello", "There", "World"]
 var ui = GDX.new().render(func(update): return (
-   [VBoxContainer, [
-      my_list.map(func(item): return (
-         [Label, { text = item }]
-      )),
-      [LineEdit, {
-         on_text_submitted = func(text):
-            my_list.append(text)
-            update.call()
-            pass,
-      }]
-   ]]
+	[VBoxContainer, [
+		my_list.map(func(item): return (
+			[Label, { text = item }]
+		)),
+		[LineEdit, {
+			on_text_submitted = func(text):
+				my_list.append(text)
+				update.call()
+				pass,
+		}]
+	]]
 ))
 ```
 Dynamic rendering can cause some nodes to be needlessly recreated. This is because nodes are tracked by their index in their parent. Rendering a dynamic list makes the index unreliable, so instead you can provide a name. Elements with a name provided can always be reused, since a node's name is not affected by index.
@@ -212,18 +212,18 @@ If you ran the example above, you may have noticed that the LineEdit keeps unfoc
 ```gdscript
 var my_list := ["Hello", "There", "World"]
 var ui = GDX.new().render(func(update): return (
-   [VBoxContainer, [
-      my_list.map(func(item): return (
-         [Label, { text = item }]
-      )),
-      [LineEdit, {
-         name = "Text Input",
-         on_text_submitted = func(text):
-            my_list.append(text)
-            update.call()
-            pass,
-      }]
-   ]]
+	[VBoxContainer, [
+		my_list.map(func(item): return (
+			[Label, { text = item }]
+		)),
+		[LineEdit, {
+			name = "Text Input",
+			on_text_submitted = func(text):
+				my_list.append(text)
+				update.call()
+				pass,
+		}]
+	]]
 ))
 ```
 
@@ -231,9 +231,9 @@ var ui = GDX.new().render(func(update): return (
 Sometimes you just need access to the node, and do some direct calls on it. For these cases, you can also put a callable in an element's array
 ```gdscript
 [OptionButton, func(it: OptionButton):
-   it.add_item("First")
-   it.add_item("Second")
-   it.add_item("Third")
+	it.add_item("First")
+	it.add_item("Second")
+	it.add_item("Third")
 ]
 ```
 
@@ -242,12 +242,12 @@ Sometimes you also need access to an element outside of the render function. The
 The first is using a "state" and a callable like in the previous example.
 ```gdscript
 var st := {
-   my_button = null
+	my_button = null
 }
 var ui = GDX.new().render(func(update): return (
-   [MarginContainer, [
-      [Button, func(it: Button): st.my_button = it]
-   ]]
+	[MarginContainer, [
+		[Button, func(it: Button): st.my_button = it]
+	]]
 ))
 my_button.text = "Some text"
 ```
@@ -255,9 +255,9 @@ The second way creates the node outside of the render function, and just include
 ```gdscript
 var my_button := Button.new()
 var ui = GDX.new().render(func(update): return (
-   [MarginContainer, [
-      [my_button]
-   ]]
+	[MarginContainer, [
+		[my_button]
+	]]
 ))
 my_button.text = "Some text"
 ```
@@ -265,15 +265,15 @@ You can even avoid adding the rendered UI to the tree like this, by just directl
 You can do all the same things to a raw node, like setting props, callables, and children.
 ```gdscript
 GDX.new().render(func(update): return (
-   [self, func(it: Control):
-      it.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT),
-   [
-      [VBoxContainer, [
-         [HBoxContainer, [
-            [Button]
-         ]]
-      ]]
-   ]]
+	[self, func(it: Control):
+		it.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT),
+	[
+		[VBoxContainer, [
+			[HBoxContainer, [
+				[Button]
+			]]
+		]]
+	]]
 ))
 ```
 
