@@ -1,5 +1,5 @@
 # Godot Global Extensions
-This is a system for creating Global Extensions for the Godot Game Engine. 
+A way to make true Global Extensions for the Godot Game Engine. 
 
 ## Installation
 This is not an addon, but a project for you to keep on your system. All you need to do is open this project in godot, and a script will be injected into EditorSettings. <br/>
@@ -53,9 +53,9 @@ func _exit_tree():
 > [!Note]
 > I've included a handy class, `Loader`, that has static variables pointing to useful absolute paths. Use this to load simple resources, like so:
 > ```gdscript
-> var image = load(Loader.global_path + "")
-> Loader.global_path # Absolute path of `Global Extensions` project
-> Loader.local_path # Absolute path of current project or 'res://'
+> var image = load(Loader.global_path + "extensions/my_extension/image.png")
+> # Loader.global_path is the absolute path of the `Global Extensions` project
+> # Loader.local_path is the absolute path of the current project or 'res://'
 > ```
 
 
@@ -83,27 +83,13 @@ Actually gets loaded as this:
 
 > [!CAUTION]
 > Because these are not real `class_name`s, Godot cannot infer their types, so avoid using `:=` with them. <br/>
-> They are also not available in top level variables, only in functions, because the static variables haven't initialized yet.<br/>
-> So the following examples will error:
+> So the following example will error, with the workaround below it:
 > ```gdscript
-> @tool
-> # Error. Top level access to Loader is not allowed
-> var my_path = Loader.global_path
+> var my_path := Loader.global_path
+> # Error. Used := but Loader is not a real class_name, so Godot can't infer it
 > 
-> # Do this instead
-> var my_path
-> 
-> func _init():
-> 	my_path = Loader.global_path
-> ```
-> ```gdscript
-> @tool
-> func _init():
-> 	# Error. Used := but Loader is not a real class_name, so Godot can't infer it
-> 	var my_path := Loader.global_path
-> 
-> 	# Do this instead
-> 	var my_path: String = Loader.global_path
+> var my_path: String = Loader.global_path
+> # No Error. If you want it to be typed you have to type it manually
 > ```
 
 ## GDX
