@@ -61,7 +61,7 @@ func copy_addons(addons: Array):
 	rfs.scan_sources()
 	print("begin scan")
 	while rfs.is_scanning():
-		print('is scanning')
+		#print('is scanning')
 		await get_tree().process_frame
 	await get_tree().process_frame
 	print("end scan")
@@ -90,6 +90,7 @@ func _enter_tree() -> void:
 			checked = !current_dir_map.has(a),
 		}
 	)
+	await get_tree().process_frame
 	GDX.new().render(func(update: Callable): return (
 		[popup, {
 			keep_title_visible = true,
