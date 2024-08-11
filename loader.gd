@@ -33,6 +33,7 @@ static func init_extensions(loader_path: String, this_file: GDScript) -> void:
 				if Engine.has_singleton(loader_name):
 					Engine.unregister_singleton(loader_name)
 				Engine.register_singleton(loader_name, this_file)
+				prints(loader_name, Engine.get_singleton(loader_name))
 				
 				var files: Array[GDScript] = []
 				var starting_path := path + "extensions/"
@@ -61,7 +62,7 @@ static func init_extensions(loader_path: String, this_file: GDScript) -> void:
 						cn = cn.trim_suffix("\n")
 						file.source_code = file.source_code.erase(cn_index_start, 11 + cn.length())
 						
-						var singleton_name := "_p_" + cn
+						var singleton_name := "_gge_" + cn
 						class_map[cn] = singleton_name
 						if Engine.has_singleton(singleton_name):
 							Engine.unregister_singleton(singleton_name)
@@ -69,9 +70,10 @@ static func init_extensions(loader_path: String, this_file: GDScript) -> void:
 				
 				for file in files:
 					for c in class_map:
-						file.source_code += "\nvar %s = Engine.get_singleton('%s')" % [c, class_map[c]]
+						file.source_code += "\nstatic var %s = Engine.get_singleton('%s')" % [c, class_map[c]]
 					if file.reload() == OK:
 						pass
+				
 				for file in files:
 					var plugin: Object = file.new()
 					if plugin is EditorPlugin:
