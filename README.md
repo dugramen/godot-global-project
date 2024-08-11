@@ -1,5 +1,5 @@
 # Godot Global Extensions
-This is a framework for creating Global Extensions for the Godot Game Engine. 
+This is a system for creating Global Extensions for the Godot Game Engine. 
 
 ## Installation
 This is not an addon, but a project for you to keep on your system. All you need to do is open this project in godot, and a script will be injected into EditorSettings. <br/>
@@ -22,14 +22,13 @@ First and foremost, extensions are \**Editor Only*\*, so they should have `@tool
 ### Folder
 - Extensions are just scripts in the `extensions` folder.
 - They must be in a subfolder, like `extensions/my_extension/my_script.gd`.
-- If they are directly in the `extensions` folder they will not load.
-- Also, if they are in a nested subfolder, like `extensions/my_extension/subfoler/my_script.gd`, they will also not load by default.
-- For those, you should manually load them (more info in [Loading Resources](#loading-resources))
+- If they are directly in the `extensions` folder, for example `extensions/my_script.gd`, they will not load.
+- Also any scripts in a nested subfolder, like `extensions/my_extension/subfolder/other_script.gd`, must be manually loaded (see [Loading Resources](#loading-resources)).
 
 ### Basics
 Each extension script will be instantiated once, so any functionality can be written in `_init()`. <br/>
 If your extension extends from `EditorPlugin`, it will also be added to the root of the editor. From there they work just like normal [EditorPlugins](https://docs.godotengine.org/en/stable/classes/class_editorplugin.html#class-editorplugin). 
-So you can use `_enter_tree()` to initialize and `_exit_tree()` to cleanup.
+So you can use `_enter_tree()` instead to initialize and `_exit_tree()` to cleanup.
 This is the main use case.
 Example:
 ```gdscript
@@ -47,13 +46,14 @@ func _exit_tree():
 > Extensions are loaded from a different directory than your current project. So you cannot use `res://` paths to load anything outside the project, you have to use absolute paths. 
 > 
 > Even with the proper absolute path, you can still only load simple resources, like an image or stylebox. <br/>
-> Any resource with subresources / dependencies will fail to load, because those paths still use `res://`. So something like PackedScene will likely fail to load.
+> Anythin with subresources / dependencies will fail to load, because those paths still use `res://`. So something like PackedScene will likely fail to load.
 > 
 > This is what GDX is for.
 
 > [!Note]
-> I've included a handy class, `Loader`, that has static variables pointing to useful absolute paths. Use this to load simple resources
+> I've included a handy class, `Loader`, that has static variables pointing to useful absolute paths. Use this to load simple resources, like so:
 > ```gdscript
+> var image = load(Loader.global_path + "")
 > Loader.global_path # Absolute path of `Global Extensions` project
 > Loader.local_path # Absolute path of current project or 'res://'
 > ```
