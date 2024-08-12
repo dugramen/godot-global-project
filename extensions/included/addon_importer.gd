@@ -46,7 +46,7 @@ func copy_addons(addons: Array):
 	# The FileSystem dock doesn't properly scan new files if scanned immediately
 	#rfs.scan()
 	var pop := PopupPanel.new()
-	GDX.render(func(a): return (
+	GDX.render(func(): return (
 		[self, [
 			[pop, { popup_window = false }, [
 				[Label, {
@@ -91,7 +91,7 @@ func _enter_tree() -> void:
 		}
 	)
 	await get_tree().process_frame
-	GDX.render(func(update: Callable): return (
+	GDX.render(func(): return (
 		[popup, {
 			keep_title_visible = true,
 			borderless = false,
@@ -105,7 +105,7 @@ func _enter_tree() -> void:
 					on_toggled = func(v):
 						for a in addons:
 							a.checked = v
-						update.call()
+						GDX.render()
 						pass,
 				}],
 				[MarginContainer, {
@@ -126,13 +126,7 @@ func _enter_tree() -> void:
 								margin_top = 8,
 								margin_bottom = 8
 							}
-						}, func(it: MarginContainer):
-							#it.add_theme_constant_override("margin_left", 8)
-							#it.add_theme_constant_override("margin_right", 8)
-							#it.add_theme_constant_override("margin_top", 8)
-							#it.add_theme_constant_override("margin_bottom", 8)
-							pass,
-						[
+						}, [
 							[VBoxContainer, [
 								addons.map(func(a): return (
 									[HBoxContainer, {
@@ -144,7 +138,7 @@ func _enter_tree() -> void:
 											size_flags_horizontal = Control.SIZE_EXPAND_FILL,
 											on_toggled = func(v):
 												a.checked = v
-												update.call()
+												GDX.render()
 												pass,
 										}],
 										[Label, { text = "New!" }] if !current_dir_map.has(a.text) else []

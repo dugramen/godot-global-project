@@ -6,13 +6,14 @@ static var _render_map := {}
 static var _deletion_map := {}
 static var _new_deletion_map := {}
 static var _current_callable: Callable
-static var rerender: Callable:
-	get():
-		var cc = _current_callable
-		return func(): render(cc)
 
-static func render(callable: Callable):
-	var tree: Array = callable.call(func(): render(callable))
+static func get_this_render() -> Callable:
+	return render.bind(_current_callable)
+
+static func render(callable: Callable = _current_callable):
+	var pc := _current_callable
+	_current_callable = callable
+	var tree: Array = callable.call()
 	var dm: Dictionary = _deletion_map.get_or_add(callable, {})
 	var ndm: Dictionary = _new_deletion_map.get_or_add(callable, {})
 	var node_from_previous_render = _render_map.get(callable, null)
@@ -27,6 +28,7 @@ static func render(callable: Callable):
 			node.queue_free()
 	_deletion_map[callable] = ndm
 	_new_deletion_map.erase(callable)
+	_current_callable = pc
 	return result
 
 static func _build_element(callable: Callable, tree: Array, context := {node = null, index = 0}):
@@ -95,8 +97,27 @@ static func _build_element(callable: Callable, tree: Array, context := {node = n
 				if key.begins_with("on_"):
 					var signal_name: String = key.trim_prefix("on_")
 					if node.has_signal(signal_name):
-						node.connect(signal_name, value)
-						connections[signal_name] = value
+						if value is Callable:
+							var sig: Signal = node.get(signal_name) as Signal
+							var connection_call := func(
+								a0 = null, 
+								a1 = null, 
+								a2 = null, 
+								a3 = null, 
+								a4 = null, 
+								a5 = null, 
+								a6 = null, 
+								a7 = null,
+								a8 = null,
+								a9 = null
+							):
+								var args := [a0, a1, a2, a3, a4, a5, a6, a7, a8, a9]
+								var old_c := _current_callable
+								_current_callable = callable
+								value.callv(args.slice(0, value.get_argument_count()))
+								_current_callable = old_c
+							node.connect(signal_name, connection_call)
+							connections[signal_name] = connection_call
 					continue
 				if node is Control and key.begins_with("theme_") and value is Dictionary:
 					for p in value:
