@@ -96,9 +96,9 @@ Actually gets loaded as this:
 This is the UI framework. This exists specifically because extensions can't load most PackedScenes, due to subresource paths. So most of the time UI will need to be done in code. This is a lightweight framework to make that a lot easier to do. It works similar to ReactJS (gdx is a reference to jsx files)
 
 ### Render
-The inital render function is a bit boilerplate-y, but its pretty simple after that:
+The GDX class has a render method. You pass it a function that returns your tree of elements. The render method outputs a Node, with the entire branch of elements built out, which you can add to the tree:
 ```gdscript
-var ui = GDX.new().render(func(update): return (
+var ui = GDX.render(func(): return (
 	# Tree of UI elements
 ))
 add_child(ui)
@@ -145,7 +145,8 @@ To customize theme properties in gdx, you can use special `theme_` props instead
 ```gdscript
 [Button, {
 	theme_constant = {
-		outline_size = 1
+		outline_size = 1,
+		icon_max_width = 24,
 	},
 	theme_color = {
 		font_color = Color.RED
@@ -166,39 +167,40 @@ To customize theme properties in gdx, you can use special `theme_` props instead
 ```
 
 ### Rerender
-The render function is passed a callback, which rerenders the UI. A rerender just calls the function again. <br/>
-As it goes down the tree, it will avoid recreating new nodes, and instead reuse nodes from the previous render where possible.
+When you want to update the ui, you call `GDX.render()` again, without any arguments. This will rerender the the current tree of elements. GDX will do its best to reuse nodes from the previous render, rather than create new nodes every time.
 <br/>
-Example:
+Rerender Example:
 ```gdscript
-GDX.new().render(func(update): return (
+GDX.render(func(): return (
 	[Button, {
 		on_pressed = func():
-			update.call(),   # rerenders the UI
+			GDX.render(),   # rerenders the UI
 	}]
 ))
 ```
 
 ### State
-For the sake of simplicity, state isn't anything special. Rather you just store variables in some reference type, like Dictionay, Array, or an Object. Then to update state, you set the variable and call the update / rerender callback. <br/>
+State is the data that your UI reads. In gdx, state is external to the render function, meaning you store it in variables outside of `GDX.render()`. Due to gdscript limitations, they should be stored in reference types, like Dictionary, Array, or Object. 
+
+To update your UI along with your state change, you just set your state variable then call `GDX.render()` to rerender the ui. <br/>
 Here's a simple counter:
 ```gdscript
 var st := { counter = 0 }
-var my_ui = GDX.new().render(func(update): return (
+var my_ui = GDX.render(func(): return (
 	[Button, {
 		text = "Count: " + str(st.counter)
 		on_pressed = func():
 			st.counter += 1
-			update.call(),
+			GDX.render(),
 	}]
 ))
 ```
 
 ### List Rendering / Dynamic Rendering
-Just map an array into elements
+Just map an array into an array of elements
 ```gdscript
 var my_list := ["Hello", "There", "World"]
-var ui = GDX.new().render(func(update): return (
+var ui = GDX.render(func(): return (
 	[VBoxContainer, [
 		my_list.map(func(item): return (
 			[Label, { text = item }]
@@ -206,18 +208,18 @@ var ui = GDX.new().render(func(update): return (
 		[LineEdit, {
 			on_text_submitted = func(text):
 				my_list.append(text)
-				update.call()
+				GDX.render()
 				pass,
 		}]
 	]]
 ))
 ```
-Dynamic rendering can cause some nodes to be needlessly recreated. This is because nodes are tracked by their index in their parent. Rendering a dynamic list makes the index unreliable, so instead you can provide a name. Elements with a name provided can always be reused, since a node's name is not affected by index.
+Dynamic rendering can cause some nodes to be needlessly recreated. This is because nodes are tracked by their index in their parent. Rendering a dynamic list makes the index unreliable, so instead you can provide a name. Elements with a name provided can always be reused.
 
-If you ran the example above, you may have noticed that the LineEdit keeps unfocusing after submitting. This is because the node was being deleted and recreated. If you give it a name, it will be reused instead
+If you ran the example above, you may have noticed that the LineEdit keeps unfocusing after submitting. This is because the node was being recreated. If you give it a name, it will be reused instead
 ```gdscript
 var my_list := ["Hello", "There", "World"]
-var ui = GDX.new().render(func(update): return (
+var ui = GDX.render(func(): return (
 	[VBoxContainer, [
 		my_list.map(func(item): return (
 			[Label, { text = item }]
@@ -226,7 +228,7 @@ var ui = GDX.new().render(func(update): return (
 			name = "Text Input",
 			on_text_submitted = func(text):
 				my_list.append(text)
-				update.call()
+				GDX.render()
 				pass,
 		}]
 	]]
@@ -250,9 +252,11 @@ The first is using a "state" and a callable like in the previous example.
 var st := {
 	my_button = null
 }
-var ui = GDX.new().render(func(update): return (
+var ui = GDX.render(func(): return (
 	[MarginContainer, [
-		[Button, func(it: Button): st.my_button = it]
+		[Button, func(it: Button):
+			st.my_button = it
+		]
 	]]
 ))
 my_button.text = "Some text"
@@ -260,17 +264,18 @@ my_button.text = "Some text"
 The second way creates the node outside of the render function, and just includes it as an element
 ```gdscript
 var my_button := Button.new()
-var ui = GDX.new().render(func(update): return (
+var ui = GDX.render(func(): return (
 	[MarginContainer, [
 		[my_button]
 	]]
 ))
 my_button.text = "Some text"
 ```
-You can even avoid adding the rendered UI to the tree like this, by just directly including the parent node in the render. <br/>
-You can do all the same things to a raw node, like setting props, callables, and children.
+This method can even be used to skip the `add_child(my_ui)`. <br/>
+All you have to do is include the parent node in the element tree. <br/>
+You can do all the same things to a raw node too, like setting props, callables, and children.
 ```gdscript
-GDX.new().render(func(update): return (
+GDX.render(func(): return (
 	[self, { "self_modulate:a" = 0.8 }, [
 		[VBoxContainer, [
 			[HBoxContainer, [
