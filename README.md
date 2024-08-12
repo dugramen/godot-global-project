@@ -76,9 +76,9 @@ Actually gets loaded as this:
  func _init():
  	print(Loader.global_path)
 
- static var Loader = Engine.get_singleton("_p_Loader")
- static var AddonImporter = Engine.get_singleton("_p_AddonImporter")
- static var GDX = Engine.get_singleton("_p_GDX")
+ static var Loader = Engine.get_singleton("_gge_Loader")
+ static var AddonImporter = Engine.get_singleton("_gge_AddonImporter")
+ static var GDX = Engine.get_singleton("_gge_GDX")
  ```
 
 > [!CAUTION]
