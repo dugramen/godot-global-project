@@ -46,7 +46,7 @@ func copy_addons(addons: Array):
 	# The FileSystem dock doesn't properly scan new files if scanned immediately
 	#rfs.scan()
 	var pop := PopupPanel.new()
-	GDX.new().render(func(a): return (
+	GDX.render(func(a): return (
 		[self, [
 			[pop, { popup_window = false }, [
 				[Label, {
@@ -91,7 +91,7 @@ func _enter_tree() -> void:
 		}
 	)
 	await get_tree().process_frame
-	GDX.new().render(func(update: Callable): return (
+	GDX.render(func(update: Callable): return (
 		[popup, {
 			keep_title_visible = true,
 			borderless = false,

@@ -12,6 +12,6 @@ static func _static_init() -> void:
 	new_scr.reload()                                            
 				
 				
-  
+   
  
  

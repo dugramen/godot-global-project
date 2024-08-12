@@ -4,73 +4,7 @@
 script/source = "extends Control
 
 func _ready() -> void:
-	var margin := MarginContainer.new()
-	var vbox := VBoxContainer.new()
-	var button := Button.new()
-	var ui = GDX.new().render(func(update): return (
-		[margin, [
-			[MarginContainer, [
-				[VBoxContainer, [
-					[button, {text = \"hi\"}],
-					[Button, {text = \"hi\"}],
-					[Button, {text = \"hi\"}],
-					[Button, {text = \"hi\"}],
-				]]
-			]]
-		]]
-	))
-	add_child(ui)
-	#var my_list := [\"Hello\", \"There\", \"World\"]
-	#GDX.new().render(func(update): return (
-		#[self, [
-			#[VBoxContainer, [
-				#my_list.map(func(item): return (
-					#[Label, { text = item }]
-				#)),
-				#[LineEdit, {
-					#name = \"LineEdit\",
-					#text = \"\",
-					#on_text_submitted = func(text):
-						#my_list.append(text)
-						#update.call()
-						#pass,
-				#}]
-			#]]
-		#]]
-	#))
-	#var st := {
-		#counter = 0
-	#}
-	#var my_ui = GDX.new().render(func(rerender): return (
-		#[self, func(it: Control): 
-			#print(it)
-			#it.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT), [
-			#[MarginContainer, [
-				#[VBoxContainer, [
-					#[Label, {
-						#text = \"Welcome to my UI\",
-						#theme_font_size = {
-							#font_size = 40
-						#},
-					#}],
-					#[Label, {
-						#text = \"Current count: \" + str(st.counter),
-						#theme_font_size = {
-							#font_size = 16
-						#},
-						#\"modulate:a\" = .5,
-					#}],
-					#[Button, {
-						#text = \"+ Increment\",
-						#on_pressed = func():
-							#st.counter += 1
-							#rerender.call()
-							#pass,
-					#}]
-				#]]
-			#]]
-		#]]
-	#))
+	pass
 "
 
 [node name="Node" type="Control"]

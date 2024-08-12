@@ -2,11 +2,16 @@
 
 class_name GDX
 
-var _render_map := {}
-var _deletion_map := {}
-var _new_deletion_map := {}
+static var _render_map := {}
+static var _deletion_map := {}
+static var _new_deletion_map := {}
+static var _current_callable: Callable
+static var rerender: Callable:
+	get():
+		var cc = _current_callable
+		return func(): render(cc)
 
-func render(callable: Callable):
+static func render(callable: Callable):
 	var tree: Array = callable.call(func(): render(callable))
 	var dm: Dictionary = _deletion_map.get_or_add(callable, {})
 	var ndm: Dictionary = _new_deletion_map.get_or_add(callable, {})
@@ -15,7 +20,7 @@ func render(callable: Callable):
 	if node_from_previous_render is Node:
 		node_from_previous_render = node_from_previous_render.get_parent()
 		index = node_from_previous_render.get_index()
-	var result = build_element(callable, tree, {index = index, node = node_from_previous_render})
+	var result = _build_element(callable, tree, {index = index, node = node_from_previous_render})
 	_render_map[callable] = result
 	for node in dm:
 		if is_instance_valid(node):
@@ -24,7 +29,7 @@ func render(callable: Callable):
 	_new_deletion_map.erase(callable)
 	return result
 
-func build_element(callable: Callable, tree: Array, context := {node = null, index = 0}):
+static func _build_element(callable: Callable, tree: Array, context := {node = null, index = 0}):
 	if tree.is_empty(): return
 	if tree[0] is Node or "new" in tree[0]:
 		var props := {}
@@ -125,11 +130,11 @@ func build_element(callable: Callable, tree: Array, context := {node = null, ind
 			index = 0
 		}
 		for child in children:
-			build_element(callable, child, new_context)
+			_build_element(callable, child, new_context)
 		context.index += 1
 		return node
 	elif tree[0] is Array:
 		var result := []
 		for branch in tree:
-			result.append(build_element(callable, branch, context))
+			result.append(_build_element(callable, branch, context))
 		return result
