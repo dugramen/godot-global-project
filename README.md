@@ -1,5 +1,5 @@
 # Godot Global Extensions
-This is a framework for creating Global Extensions for the Godot Game Engine. 
+A way to make true Global Extensions for the Godot Game Engine. 
 
 ## Installation
 This is not an addon, but a project for you to keep on your system. All you need to do is open this project in godot, and a script will be injected into EditorSettings. <br/>
@@ -22,14 +22,13 @@ First and foremost, extensions are \**Editor Only*\*, so they should have `@tool
 ### Folder
 - Extensions are just scripts in the `extensions` folder.
 - They must be in a subfolder, like `extensions/my_extension/my_script.gd`.
-- If they are directly in the `extensions` folder they will not load.
-- Also, if they are in a nested subfolder, like `extensions/my_extension/subfoler/my_script.gd`, they will also not load by default.
-- For those, you should manually load them (more info in [Loading Resources](#loading-resources))
+- If they are directly in the `extensions` folder, for example `extensions/my_script.gd`, they will not load.
+- Also any scripts in a nested subfolder, like `extensions/my_extension/subfolder/other_script.gd`, must be manually loaded (see [Loading Resources](#loading-resources)).
 
 ### Basics
 Each extension script will be instantiated once, so any functionality can be written in `_init()`. <br/>
 If your extension extends from `EditorPlugin`, it will also be added to the root of the editor. From there they work just like normal [EditorPlugins](https://docs.godotengine.org/en/stable/classes/class_editorplugin.html#class-editorplugin). 
-So you can use `_enter_tree()` to initialize and `_exit_tree()` to cleanup.
+So you can use `_enter_tree()` instead to initialize and `_exit_tree()` to cleanup.
 This is the main use case.
 Example:
 ```gdscript
@@ -47,15 +46,16 @@ func _exit_tree():
 > Extensions are loaded from a different directory than your current project. So you cannot use `res://` paths to load anything outside the project, you have to use absolute paths. 
 > 
 > Even with the proper absolute path, you can still only load simple resources, like an image or stylebox. <br/>
-> Any resource with subresources / dependencies will fail to load, because those paths still use `res://`. So something like PackedScene will likely fail to load.
+> Anythin with subresources / dependencies will fail to load, because those paths still use `res://`. So something like PackedScene will likely fail to load.
 > 
 > This is what GDX is for.
 
 > [!Note]
-> I've included a handy class, `Loader`, that has static variables pointing to useful absolute paths. Use this to load simple resources
+> I've included a handy class, `Loader`, that has static variables pointing to useful absolute paths. Use this to load simple resources, like so:
 > ```gdscript
-> Loader.global_path # Absolute path of `Global Extensions` project
-> Loader.local_path # Absolute path of current project or 'res://'
+> var image = load(Loader.global_path + "extensions/my_extension/image.png")
+> # Loader.global_path is the absolute path of the `Global Extensions` project
+> # Loader.local_path is the absolute path of the current project or 'res://'
 > ```
 
 
@@ -83,36 +83,22 @@ Actually gets loaded as this:
 
 > [!CAUTION]
 > Because these are not real `class_name`s, Godot cannot infer their types, so avoid using `:=` with them. <br/>
-> They are also not available in top level variables, only in functions, because the static variables haven't initialized yet.<br/>
-> So the following examples will error:
+> So the following example will error, with the workaround below it:
 > ```gdscript
-> @tool
-> # Error. Top level access to Loader is not allowed
-> var my_path = Loader.global_path
+> var my_path := Loader.global_path
+> # Error. Used := but Loader is not a real class_name, so Godot can't infer it
 > 
-> # Do this instead
-> var my_path
-> 
-> func _init():
-> 	my_path = Loader.global_path
-> ```
-> ```gdscript
-> @tool
-> func _init():
-> 	# Error. Used := but Loader is not a real class_name, so Godot can't infer it
-> 	var my_path := Loader.global_path
-> 
-> 	# Do this instead
-> 	var my_path: String = Loader.global_path
+> var my_path: String = Loader.global_path
+> # No Error. If you want it to be typed you have to type it manually
 > ```
 
 ## GDX
 This is the UI framework. This exists specifically because extensions can't load most PackedScenes, due to subresource paths. So most of the time UI will need to be done in code. This is a lightweight framework to make that a lot easier to do. It works similar to ReactJS (gdx is a reference to jsx files)
 
 ### Render
-The inital render function is a bit boilerplate-y, but its pretty simple after that:
+The GDX class has a render method. You pass it a function that returns your tree of elements. The render method outputs a Node, with the entire branch of elements built out, which you can add to the tree:
 ```gdscript
-var ui = GDX.new().render(func(update): return (
+var ui = GDX.render(func(): return (
 	# Tree of UI elements
 ))
 add_child(ui)
@@ -159,7 +145,8 @@ To customize theme properties in gdx, you can use special `theme_` props instead
 ```gdscript
 [Button, {
 	theme_constant = {
-		outline_size = 1
+		outline_size = 1,
+		icon_max_width = 24,
 	},
 	theme_color = {
 		font_color = Color.RED
@@ -180,39 +167,40 @@ To customize theme properties in gdx, you can use special `theme_` props instead
 ```
 
 ### Rerender
-The render function is passed a callback, which rerenders the UI. A rerender just calls the function again. <br/>
-As it goes down the tree, it will avoid recreating new nodes, and instead reuse nodes from the previous render where possible.
+When you want to update the ui, you call `GDX.render()` again, without any arguments. This will rerender the the current tree of elements. GDX will do its best to reuse nodes from the previous render, rather than create new nodes every time.
 <br/>
-Example:
+Rerender Example:
 ```gdscript
-GDX.new().render(func(update): return (
+GDX.render(func(): return (
 	[Button, {
 		on_pressed = func():
-			update.call(),   # rerenders the UI
+			GDX.render(),   # rerenders the UI
 	}]
 ))
 ```
 
 ### State
-For the sake of simplicity, state isn't anything special. Rather you just store variables in some reference type, like Dictionay, Array, or an Object. Then to update state, you set the variable and call the update / rerender callback. <br/>
+State is the data that your UI reads. In gdx, state is external to the render function, meaning you store it in variables outside of `GDX.render()`. Due to gdscript limitations, they should be stored in reference types, like Dictionary, Array, or Object. 
+
+To update your UI along with your state change, you just set your state variable then call `GDX.render()` to rerender the ui. <br/>
 Here's a simple counter:
 ```gdscript
 var st := { counter = 0 }
-var my_ui = GDX.new().render(func(update): return (
+var my_ui = GDX.render(func(): return (
 	[Button, {
 		text = "Count: " + str(st.counter)
 		on_pressed = func():
 			st.counter += 1
-			update.call(),
+			GDX.render(),
 	}]
 ))
 ```
 
 ### List Rendering / Dynamic Rendering
-Just map an array into elements
+Just map an array into an array of elements
 ```gdscript
 var my_list := ["Hello", "There", "World"]
-var ui = GDX.new().render(func(update): return (
+var ui = GDX.render(func(): return (
 	[VBoxContainer, [
 		my_list.map(func(item): return (
 			[Label, { text = item }]
@@ -220,18 +208,18 @@ var ui = GDX.new().render(func(update): return (
 		[LineEdit, {
 			on_text_submitted = func(text):
 				my_list.append(text)
-				update.call()
+				GDX.render()
 				pass,
 		}]
 	]]
 ))
 ```
-Dynamic rendering can cause some nodes to be needlessly recreated. This is because nodes are tracked by their index in their parent. Rendering a dynamic list makes the index unreliable, so instead you can provide a name. Elements with a name provided can always be reused, since a node's name is not affected by index.
+Dynamic rendering can cause some nodes to be needlessly recreated. This is because nodes are tracked by their index in their parent. Rendering a dynamic list makes the index unreliable, so instead you can provide a name. Elements with a name provided can always be reused.
 
-If you ran the example above, you may have noticed that the LineEdit keeps unfocusing after submitting. This is because the node was being deleted and recreated. If you give it a name, it will be reused instead
+If you ran the example above, you may have noticed that the LineEdit keeps unfocusing after submitting. This is because the node was being recreated. If you give it a name, it will be reused instead
 ```gdscript
 var my_list := ["Hello", "There", "World"]
-var ui = GDX.new().render(func(update): return (
+var ui = GDX.render(func(): return (
 	[VBoxContainer, [
 		my_list.map(func(item): return (
 			[Label, { text = item }]
@@ -240,7 +228,7 @@ var ui = GDX.new().render(func(update): return (
 			name = "Text Input",
 			on_text_submitted = func(text):
 				my_list.append(text)
-				update.call()
+				GDX.render()
 				pass,
 		}]
 	]]
@@ -264,9 +252,11 @@ The first is using a "state" and a callable like in the previous example.
 var st := {
 	my_button = null
 }
-var ui = GDX.new().render(func(update): return (
+var ui = GDX.render(func(): return (
 	[MarginContainer, [
-		[Button, func(it: Button): st.my_button = it]
+		[Button, func(it: Button):
+			st.my_button = it
+		]
 	]]
 ))
 my_button.text = "Some text"
@@ -274,17 +264,18 @@ my_button.text = "Some text"
 The second way creates the node outside of the render function, and just includes it as an element
 ```gdscript
 var my_button := Button.new()
-var ui = GDX.new().render(func(update): return (
+var ui = GDX.render(func(): return (
 	[MarginContainer, [
 		[my_button]
 	]]
 ))
 my_button.text = "Some text"
 ```
-You can even avoid adding the rendered UI to the tree like this, by just directly including the parent node in the render. <br/>
-You can do all the same things to a raw node, like setting props, callables, and children.
+This method can even be used to skip the `add_child(my_ui)`. <br/>
+All you have to do is include the parent node in the element tree. <br/>
+You can do all the same things to a raw node too, like setting props, callables, and children.
 ```gdscript
-GDX.new().render(func(update): return (
+GDX.render(func(): return (
 	[self, { "self_modulate:a" = 0.8 }, [
 		[VBoxContainer, [
 			[HBoxContainer, [
