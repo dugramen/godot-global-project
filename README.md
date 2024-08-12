@@ -43,12 +43,12 @@ func _exit_tree():
 ```
 ### Loading Resources
 > [!WARNING]
-> Extensions are loaded from a different directory than your current project. So you cannot use `res://` paths to load anything outside the project, you have to use absolute paths. 
+> Extensions are loaded from a different directory than your running project. So you cannot use `res://` paths to load anything outside the running project, you have to use absolute paths. 
 > 
 > Even with the proper absolute path, you can still only load simple resources, like an image or stylebox. <br/>
 > Anythin with subresources / dependencies will fail to load, because those paths still use `res://`. So something like PackedScene will likely fail to load.
 > 
-> This is what GDX is for.
+> This is what GDX, the script based UI framework, is for.
 
 > [!Note]
 > I've included a handy class, `Loader`, that has static variables pointing to useful absolute paths. Use this to load simple resources, like so:
