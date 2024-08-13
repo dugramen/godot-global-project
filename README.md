@@ -16,16 +16,19 @@ Earlier this year I made an addon called `globalize-plugins`. It required you to
 - `Addons` work similarly to `globalize-plugins`, except that they are only copied over from this `/adddons` directory.
    - When you open a new project project, you will be shown a prompt asking which addons you want to import. This will appear once per project, but can be accessed again from `Project > Tools > Addon Importer`
 
-## Making Extensions
+# Making Extensions
+> [!NOTE]
+> GitHub's tab length is 8 spaces! It doesn't look great, but since gdscript requires the use of tabs, there's not much I can do about it.<br/>
+> Just keep in mind that the code samples are a lot more compact in Godot itself.
 First and foremost, extensions are \**Editor Only*\*, so they should have `@tool`. They will not be copied into the project. If you need something included in your project, it should be an addon.
 
-### Folder
+## Folder
 - Extensions are just scripts in the `extensions` folder.
 - They must be in a subfolder, like `extensions/my_extension/my_script.gd`.
 - If they are directly in the `extensions` folder, for example `extensions/my_script.gd`, they will not load.
 - Also any scripts in a nested subfolder, like `extensions/my_extension/subfolder/other_script.gd`, must be manually loaded (see [Loading Resources](#loading-resources)).
 
-### Basics
+## Basics
 Each extension script will be instantiated once, so any functionality can be written in `_init()`. <br/>
 If your extension extends from `EditorPlugin`, it will also be added to the root of the editor. From there they work just like normal [EditorPlugins](https://docs.godotengine.org/en/stable/classes/class_editorplugin.html#class-editorplugin). 
 So you can use `_enter_tree()` instead to initialize and `_exit_tree()` to cleanup.
@@ -41,14 +44,14 @@ func _enter_tree():
 func _exit_tree():
 	remove_tool_menu_item("Test")
 ```
-### Loading Resources
+## Loading Resources
 > [!WARNING]
-> Extensions are loaded from a different directory than your current project. So you cannot use `res://` paths to load anything outside the project, you have to use absolute paths. 
+> Extensions are loaded from a different directory than your running project. So you cannot use `res://` paths to load anything outside the running project, you have to use absolute paths. 
 > 
 > Even with the proper absolute path, you can still only load simple resources, like an image or stylebox. <br/>
 > Anythin with subresources / dependencies will fail to load, because those paths still use `res://`. So something like PackedScene will likely fail to load.
 > 
-> This is what GDX is for.
+> This is what GDX, the script based UI framework, is for.
 
 > [!Note]
 > I've included a handy class, `Loader`, that has static variables pointing to useful absolute paths. Use this to load simple resources, like so:
@@ -59,7 +62,7 @@ func _exit_tree():
 > ```
 
 
-### class_name
+## class_name
 `class_name` is handled in a special way. Normally, loading a script does not actually register the `class_name` globally. Only scripts saved in the actual project are available by their `class_name`. 
 
 To overcome this, extensions are handled differently. Instead of loading the script directly, a duplicate is loaded with extra static variables added to the bottom. These variables point to all the class_names of your extensions, letting you access them almost as if they were actually registered globally.
@@ -76,9 +79,9 @@ Actually gets loaded as this:
  func _init():
  	print(Loader.global_path)
 
- static var Loader = Engine.get_singleton("_p_Loader")
- static var AddonImporter = Engine.get_singleton("_p_AddonImporter")
- static var GDX = Engine.get_singleton("_p_GDX")
+ static var Loader = Engine.get_singleton("_gge_Loader")
+ static var AddonImporter = Engine.get_singleton("_gge_AddonImporter")
+ static var GDX = Engine.get_singleton("_gge_GDX")
  ```
 
 > [!CAUTION]
@@ -92,10 +95,10 @@ Actually gets loaded as this:
 > # No Error. If you want it to be typed you have to type it manually
 > ```
 
-## GDX
+# GDX
 This is the UI framework. This exists specifically because extensions can't load most PackedScenes, due to subresource paths. So most of the time UI will need to be done in code. This is a lightweight framework to make that a lot easier to do. It works similar to ReactJS (gdx is a reference to jsx files)
 
-### Render
+## Render
 The GDX class has a render method. You pass it a function that returns your tree of elements. The render method outputs a Node, with the entire branch of elements built out, which you can add to the tree:
 ```gdscript
 var ui = GDX.render(func(): return (
@@ -104,7 +107,7 @@ var ui = GDX.render(func(): return (
 add_child(ui)
 ```
 
-### Structure
+## Structure
 An element structure is an array that looks like this `[NodeType, { Properties }, [ Children ]]`. <br/>
 Example:
 ```gdscript
@@ -115,7 +118,7 @@ Example:
 ]]
 ```
 
-### Nested Properties
+## Nested Properties
 Some property values have nested properties, like Color or Vector2. You can set those too like you would with a NodePath. And they can edit previously set props.
 ```gdscript
 [Label, {
@@ -126,7 +129,7 @@ Some property values have nested properties, like Color or Vector2. You can set 
 }]
 ```
 
-### Signals
+## Signals
 A signal connection is just a prop with "on_" followed by the signal name. <br/>
 Example:
 ```gdscript
@@ -139,7 +142,7 @@ Example:
 ```
 > Godot's function syntax is pretty annoying here. For some reason it complains unless that last comma is there
 
-### Theme Properties
+## Theme Properties
 Control nodes have various theme properties that are only editable using methods like `add_theme_color_override`. <br/>
 To customize theme properties in gdx, you can use special `theme_` props instead.
 ```gdscript
@@ -166,7 +169,7 @@ To customize theme properties in gdx, you can use special `theme_` props instead
 }]
 ```
 
-### Rerender
+## Rerender
 When you want to update the ui, you call `GDX.render()` again, without any arguments. This will rerender the the current tree of elements. GDX will do its best to reuse nodes from the previous render, rather than create new nodes every time.
 <br/>
 Rerender Example:
@@ -179,7 +182,7 @@ GDX.render(func(): return (
 ))
 ```
 
-### State
+## State
 State is the data that your UI reads. In gdx, state is external to the render function, meaning you store it in variables outside of `GDX.render()`. Due to gdscript limitations, they should be stored in reference types, like Dictionary, Array, or Object. 
 
 To update your UI along with your state change, you just set your state variable then call `GDX.render()` to rerender the ui. <br/>
@@ -196,8 +199,8 @@ var my_ui = GDX.render(func(): return (
 ))
 ```
 
-### List Rendering / Dynamic Rendering
-Just map an array into an array of elements
+## List Rendering / Dynamic Rendering
+Just map an array into an array of elements. You can also use an extra method `GDX.map_i(array, func(element, index, array): return)`, if you want access to the index or array while mapping.
 ```gdscript
 var my_list := ["Hello", "There", "World"]
 var ui = GDX.render(func(): return (
@@ -235,7 +238,7 @@ var ui = GDX.render(func(): return (
 ))
 ```
 
-### Callables in element
+## Callables in element
 Sometimes you just need access to the node, and do some direct calls on it. For these cases, you can also put a callable in an element's array
 ```gdscript
 [OptionButton, func(it: OptionButton):
@@ -245,7 +248,7 @@ Sometimes you just need access to the node, and do some direct calls on it. For 
 ]
 ```
 
-### Access element outside of render
+## Access element outside of render
 Sometimes you also need access to an element outside of the render function. There are 2 ways of doing this. <br/>
 The first is using a "state" and a callable like in the previous example.
 ```gdscript
@@ -271,7 +274,9 @@ var ui = GDX.render(func(): return (
 ))
 my_button.text = "Some text"
 ```
-This method can even be used to skip the `add_child(my_ui)`. <br/>
+
+## Streamlining `add_child`
+The above method can even be used to skip the `add_child(my_ui)`. <br/>
 All you have to do is include the parent node in the element tree. <br/>
 You can do all the same things to a raw node too, like setting props, callables, and children.
 ```gdscript
@@ -286,8 +291,47 @@ GDX.render(func(): return (
 ))
 ```
 
-## Troubleshooting
-### Editor Crash
+## Reusable Components
+There's no special syntax for reusable components. You can use gdscript's existing features to achieve this.<br/>
+With classes:
+```gdscript
+class TaskList extends VBoxContainer:
+	var items := []
+	func _ready():
+		GDX.render(func(): return (
+			[self, [
+				GDX.map_i(items, func(item, i): return (
+					[TaskItem, {
+						text = item.text,
+						enabled = item.enabled,
+						on_deleted = func():
+							items.remove_at(i)
+							GDX.render(),
+					}]
+				))
+			]]
+		))
+
+class TaskItem extends HBoxContainer:
+	signal deleted
+	var text := ""
+	var enabled := false
+	func _ready():
+		GDX.render(func(): return (
+			[self, [
+				[CheckBox, {
+					text = text
+				}],
+				[Button, {
+					text = "Delete",
+					on_pressed = deleted.emit
+				}]
+			]]
+		))
+```
+
+# Troubleshooting
+## Editor Crash
 Since extensions load alongside the editor, if one of them is bugged, the editor may crash.
 
 Just move the bugged extensions outside of the `extensions` folder.
