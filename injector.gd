@@ -10,7 +10,7 @@ static func _static_init() -> void:
 		.replace("_PATH_TO_REPLACE_", ProjectSettings.globalize_path("res://loader.gd"))
 	settings.set_setting("portable_plugins/injected_script", new_scr)
 	new_scr.reload()                                            
-				
+				 
 				
    
  

@@ -98,7 +98,7 @@ static func _build_element(callable: Callable, tree: Array, context := {node = n
 					var signal_name: String = key.trim_prefix("on_")
 					if node.has_signal(signal_name):
 						if value is Callable:
-							var sig: Signal = node.get(signal_name) as Signal
+							#var sig: Signal = node.get(signal_name) as Signal
 							var connection_call := func(
 								a0 = null, 
 								a1 = null, 
@@ -159,3 +159,10 @@ static func _build_element(callable: Callable, tree: Array, context := {node = n
 		for branch in tree:
 			result.append(_build_element(callable, branch, context))
 		return result
+
+static func map_i(arr: Array, callable: Callable):
+	var result := []
+	for i in arr.size():
+		var args := [arr[i], i, arr]
+		result.append(callable.callv(args.slice(0, callable.get_argument_count())))
+	return result

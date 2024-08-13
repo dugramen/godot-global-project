@@ -4,7 +4,9 @@
 script/source = "extends Control
 
 func _ready() -> void:
+	#print(ResourceLoader.get_dependencies(\"res://node.tscn\"))
 	pass
+	
 "
 
 [node name="Node" type="Control"]

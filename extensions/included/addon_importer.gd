@@ -128,7 +128,8 @@ func _enter_tree() -> void:
 							}
 						}, [
 							[VBoxContainer, [
-								addons.map(func(a): return (
+								GDX.map_i(addons, func(a): return (
+									
 									[HBoxContainer, {
 										size_flags_horizontal = Control.SIZE_EXPAND_FILL
 									}, [
@@ -144,6 +145,8 @@ func _enter_tree() -> void:
 										[Label, { text = "New!" }] if !current_dir_map.has(a.text) else []
 									]]
 								))
+								#addons.map(func(a): return (
+								#))
 							]]
 						]]
 					]]
