@@ -342,4 +342,3 @@ If that doesn't work, there may be an error in my `runner.gd` script, which is i
 ![image](https://github.com/user-attachments/assets/31cadeda-d22d-48d5-ad65-9b410cb96b5d)
 
 If you don't know how to open it in a text editor, or are too scared to make changes, just delete the whole `editor_settings-4.x` file, and godot will recreate it when it next loads.
-

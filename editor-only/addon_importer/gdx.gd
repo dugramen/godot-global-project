@@ -1,11 +1,10 @@
 @tool
 
-class_name GDX
-
 static var _render_map := {}
 static var _deletion_map := {}
 static var _new_deletion_map := {}
 static var _current_callable: Callable
+static var hello := "World!"
 
 static func get_this_render() -> Callable:
 	return render.bind(_current_callable)
@@ -49,6 +48,7 @@ static func _build_element(callable: Callable, tree: Array, context := {node = n
 		
 		# Create or reuse node
 		var node: Node = null
+		#prints('index ', context.index, node)
 		if tree[0] is Node:
 			node = tree[0]
 			if parent:
