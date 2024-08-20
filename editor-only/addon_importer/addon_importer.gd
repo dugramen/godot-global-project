@@ -82,10 +82,28 @@ func import_by_colors():
 					local_project_path.path_join(path) + "/" + file_name
 				)
 	
+	var popup := PopupPanel.new()
+	gdx.render(func(): return (
+		[self, [
+			[popup, { 
+				popup_window = false, 
+				title = "Please wait",
+				exclusive = true,
+				borderless = false,
+				keep_title_visible = true,
+			}, [
+				[Label, {
+					text = "Enabling Imported Addons"
+				}]
+			]]
+		]]
+	))
+	popup.popup_centered()
+	
 	rfs.scan_sources()
 	#rfs.scan()
 	while rfs.is_scanning():
-		print('is scanning')
+		#print('is scanning')
 		await get_tree().process_frame
 	
 	#await get_tree().create_timer(3).timeout
@@ -102,6 +120,7 @@ func import_by_colors():
 		else:
 			## Create a plugin for each EditorPlugin gdscript file
 			pass
+	popup.hide()
 
 func copy_addons(addons: Array):
 	var plugin_folders_to_enable := []
