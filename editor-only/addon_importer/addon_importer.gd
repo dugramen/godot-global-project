@@ -47,24 +47,25 @@ func import_by_colors():
 			EditorInterface.set_plugin_enabled(plugin_path, false)
 			#plugins_to_enable.push_back(path.path_join("plugin.cfg"))
 		if FileAccess.file_exists(path.path_join(file_extension)):
+			print('deleting ', dir_name)
 			delete_directory(local_project_path.path_join("addons").path_join(dir_name))
 	
 	
 	for addon_path in DirAccess.get_directories_at(global_extension_path.path_join("addons")):
 		var res_path := "res://addons".path_join(addon_path)
 		var color = folder_colors.get(res_path + '/')
-		prints(res_path, color, res_path.path_join(file_extension))
+		#prints(res_path, color, res_path.path_join(file_extension))
 		
 		if color not in ["red", "orange"]:
 			continue
 		if color == "red":
 			DirAccess.make_dir_recursive_absolute(res_path)
 			FileAccess.open(res_path.path_join(file_extension), FileAccess.WRITE)
-			print(FileAccess.get_open_error())
+			#print(FileAccess.get_open_error())
 			#var tracker_file := ConfigFile.new()
 			#
 			#print(tracker_file.save(res_path.path_join(file_extension)))
-			print("saved global red")
+			#print("saved global red")
 		
 		var plugin_path := res_path.path_join("plugin.cfg")
 		if FileAccess.file_exists(plugin_path):
@@ -191,6 +192,24 @@ func copy_addons(addons: Array):
 	pop.hide()
 	pop.queue_free()
 
+func modify_folder_color_text():
+	var dock := EditorInterface.get_file_system_dock()
+	var menu: PopupMenu = dock.get_child(2, true)
+	if menu:
+		print(menu)
+		print(menu.item_count)
+		print(menu.get_children(true))
+		for i in menu.item_count:
+			print(menu.get_item_text(i))
+	menu.about_to_popup.connect(
+		func():
+			var color_menu = menu.get_child(-1, true)
+			if color_menu is PopupMenu:
+				for i in color_menu.item_count:
+					var text = color_menu.get_item_text(i)
+					print(text)
+					color_menu.set_item_text(i, text + " - " + str(i))
+	)
 
 func _enter_tree() -> void:
 	#print('loader ', Loader)
@@ -201,7 +220,11 @@ func _enter_tree() -> void:
 	#print('loader global path ', Loader.global_path)
 	#print('abs loader ', Loader.resource_path)
 	
-	if global_extension_path == local_project_path: return
+	modify_folder_color_text()
+	return
+	
+	if global_extension_path == local_project_path: 
+		return
 	
 	print(gdx.map_i([1, 2, 3], func(a): return "num-" + str(a)))
 	

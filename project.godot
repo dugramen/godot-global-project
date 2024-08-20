@@ -19,14 +19,9 @@ run/main_scene="res://node.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 config/icon="res://icon.svg"
 
-[file_customization]
+[editor_plugins]
 
-folder_colors={
-"res://addons/dialogue_manager/": "red",
-"res://addons/explore-editor-theme/": "red",
-"res://addons/script-dock/": "red",
-"res://addons/zylann.editor_debugger/": "red"
-}
+enabled=PackedStringArray("res://addons/zylann.editor_debugger/plugin.cfg")
 
 [rendering]
 
