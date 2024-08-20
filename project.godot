@@ -22,7 +22,10 @@ config/icon="res://icon.svg"
 [file_customization]
 
 folder_colors={
-"res://addons/zylann.editor_debugger/": "yellow"
+"res://addons/dialogue_manager/": "red",
+"res://addons/explore-editor-theme/": "red",
+"res://addons/script-dock/": "red",
+"res://addons/zylann.editor_debugger/": "red"
 }
 
 [rendering]

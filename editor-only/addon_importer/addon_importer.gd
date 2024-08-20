@@ -31,7 +31,7 @@ func import_by_colors():
 	
 	var rfs := EditorInterface.get_resource_filesystem()
 	while rfs.is_scanning():
-		print('is scanning')
+		#print('is scanning')
 		await get_tree().process_frame
 	
 	var plugins_to_enable := []
@@ -54,15 +54,17 @@ func import_by_colors():
 		var res_path := "res://addons".path_join(addon_path)
 		var color = folder_colors.get(res_path + '/')
 		prints(res_path, color, res_path.path_join(file_extension))
-		print([color])
 		
 		if color not in ["red", "orange"]:
-			prints("skipped ", color, addon_path)
 			continue
 		if color == "red":
-			var tracker_file := ConfigFile.new()
-			tracker_file.save(res_path.path_join(file_extension))
-			print("saved red")
+			DirAccess.make_dir_recursive_absolute(res_path)
+			FileAccess.open(res_path.path_join(file_extension), FileAccess.WRITE)
+			print(FileAccess.get_open_error())
+			#var tracker_file := ConfigFile.new()
+			#
+			#print(tracker_file.save(res_path.path_join(file_extension)))
+			print("saved global red")
 		
 		var plugin_path := res_path.path_join("plugin.cfg")
 		if FileAccess.file_exists(plugin_path):
@@ -95,8 +97,8 @@ func import_by_colors():
 		var cfg_path := "res://addons".path_join(dir_name).path_join("plugin.cfg")
 		#if plugin_exist_map.has(cfg_path): continue
 		if FileAccess.file_exists(cfg_path):
-			if !EditorInterface.is_plugin_enabled(cfg_path):
-				EditorInterface.set_plugin_enabled(cfg_path, true)
+			EditorInterface.set_plugin_enabled(cfg_path, true)
+			#if !EditorInterface.is_plugin_enabled(cfg_path):
 		else:
 			## Create a plugin for each EditorPlugin gdscript file
 			pass

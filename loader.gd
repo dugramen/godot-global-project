@@ -44,7 +44,7 @@ static func init_extensions(loader_path: String, this_file: GDScript) -> void:
 						var file_path := global_path.path_join(path).path_join(file_name)
 						if file_name.ends_with(".gd"):
 							var file := GDScript.new()
-							file.take_over_path("res://".path_join(path).path_join(file_name))
+							#file.take_over_path("res://".path_join(path).path_join(file_name))
 							file.source_code = FileAccess.get_file_as_string(file_path)
 							process_extension(file, global_path)
 							#print('takeover - ', "res://".path_join(path).path_join(file_name))
