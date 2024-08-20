@@ -4,8 +4,8 @@ extends EditorPlugin
 #var gdx := preload("D:/Godot/global-extensions//extensions/included/gdx.gd")
 #var local_loader = load("res://loader.gd")
 #var Loader := preload("D:/Godot/global-extensions//loader.gd")
-var gdx := preload("res://editor-only/addon_importer/gdx.gd")
-#var chok = preload("res://extensions/../extensions/addon_importer/gdx.gd")
+var gdx := preload("D:/Godot/global-extensions//editor-only/addon_importer/gdx.gd")
+#var chok = preload("D:/Godot/global-extensions//extensions/../extensions/addon_importer/gdx.gd")
 
 var global_extension_path := "D:/godot/global-extensions"
 var local_project_path := ProjectSettings.globalize_path("res://")
@@ -29,36 +29,74 @@ func import_by_colors():
 	
 	var file_extension := '.global-red'
 	
+	var rfs := EditorInterface.get_resource_filesystem()
+	while rfs.is_scanning():
+		print('is scanning')
+		await get_tree().process_frame
+	
+	var plugins_to_enable := []
+	var plugin_exist_map := {}
+	
 	# Delete reds
+	DirAccess.make_dir_absolute(local_project_path.path_join("addons"))
 	for dir_name in DirAccess.get_directories_at("res://addons"):
 		var path := "res://addons".path_join(dir_name)
+		var plugin_path := path.path_join("plugin.cfg")
+		if FileAccess.file_exists(plugin_path):
+			plugin_exist_map[plugin_path] = true
+			EditorInterface.set_plugin_enabled(plugin_path, false)
+			#plugins_to_enable.push_back(path.path_join("plugin.cfg"))
 		if FileAccess.file_exists(path.path_join(file_extension)):
-			delete_directory(local_project_path.path_join("addons"))
+			delete_directory(local_project_path.path_join("addons").path_join(dir_name))
 	
-	var paths := ["/addons"]
-	while !paths.is_empty():
-		var path: String = paths.pop_back()
-		DirAccess.make_dir_absolute(local_project_path + path)
-		for dir_name in DirAccess.get_directories_at(global_extension_path + "/" + path):
-			var res_path := "res://".path_join(path).path_join(dir_name)
-			var color = folder_colors.get(res_path)
-			# Red and orange auto copy into the directory
-			if color == "red" or color == "orange":
+	
+	for addon_path in DirAccess.get_directories_at(global_extension_path.path_join("addons")):
+		var res_path := "res://addons".path_join(addon_path)
+		var color = folder_colors.get(res_path + '/')
+		prints(res_path, color, res_path.path_join(file_extension))
+		print([color])
+		
+		if color not in ["red", "orange"]:
+			prints("skipped ", color, addon_path)
+			continue
+		if color == "red":
+			var tracker_file := ConfigFile.new()
+			tracker_file.save(res_path.path_join(file_extension))
+			print("saved red")
+		
+		var plugin_path := res_path.path_join("plugin.cfg")
+		if FileAccess.file_exists(plugin_path):
+			plugin_exist_map[res_path.path_join("plugin.cfg")] = true
+		
+		var paths := ["addons".path_join(addon_path)]
+		while !paths.is_empty():
+			var path: String = paths.pop_back()
+			DirAccess.make_dir_absolute(local_project_path.path_join(path))
+			for dir_name in DirAccess.get_directories_at(global_extension_path.path_join(path)):
 				paths.push_back(path.path_join(dir_name))
-			# Reds should sync with global project, so get an empty file marking them for deletion
-			if color == "red":
-				var tracker_file := ConfigFile.new()
-				tracker_file.save(res_path.path_join(file_extension))
-		for file_name in DirAccess.get_files_at(global_extension_path + "/" + path):
-			DirAccess.copy_absolute(
-				global_extension_path + path + "/" + file_name,
-				local_project_path + path + "/" + file_name
-			)
+			for file_name in DirAccess.get_files_at(global_extension_path.path_join(path)):
+				DirAccess.copy_absolute(
+					global_extension_path.path_join(path) + "/" + file_name,
+					local_project_path.path_join(path) + "/" + file_name
+				)
+	
+	rfs.scan_sources()
+	#rfs.scan()
+	while rfs.is_scanning():
+		print('is scanning')
+		await get_tree().process_frame
+	
+	#await get_tree().create_timer(3).timeout
+	
+	#for plugin in plugins_to_enable:
+		#EditorInterface.set_plugin_enabled(plugin, true)
 	
 	for dir_name in DirAccess.get_directories_at("res://addons"):
 		var cfg_path := "res://addons".path_join(dir_name).path_join("plugin.cfg")
+		#if plugin_exist_map.has(cfg_path): continue
 		if FileAccess.file_exists(cfg_path):
-			EditorInterface.set_plugin_enabled(cfg_path, true)
+			if !EditorInterface.is_plugin_enabled(cfg_path):
+				EditorInterface.set_plugin_enabled(cfg_path, true)
 		else:
 			## Create a plugin for each EditorPlugin gdscript file
 			pass
@@ -142,9 +180,11 @@ func _enter_tree() -> void:
 	#print('loader global path ', Loader.global_path)
 	#print('abs loader ', Loader.resource_path)
 	
+	if global_extension_path == local_project_path: return
+	
 	print(gdx.map_i([1, 2, 3], func(a): return "num-" + str(a)))
 	
-	import_by_colors()
+	await import_by_colors()
 	
 	var path: String = global_extension_path
 	var popup := PopupPanel.new()

@@ -29,13 +29,15 @@ static func init_extensions(loader_path: String, this_file: GDScript) -> void:
 				global_path = loader_path.trim_suffix("loader.gd")
 				local_path = ProjectSettings.globalize_path("res://")
 				
+				if global_path == local_path: return
+				
 				var scripts: Array[Script] = []
 				var paths := ["editor-only"]
 				while !paths.is_empty():
 					var path: String = paths.pop_back()
-					print(path)
-					print(global_path.path_join(path))
-					print(DirAccess.get_directories_at(global_path.path_join(path)))
+					#print(path)
+					#print(global_path.path_join(path))
+					#print(DirAccess.get_directories_at(global_path.path_join(path)))
 					for dir_name in DirAccess.get_directories_at(global_path.path_join(path)):
 						paths.push_back(path.path_join(dir_name))
 					for file_name in DirAccess.get_files_at(global_path.path_join(path)):
@@ -61,7 +63,7 @@ static func init_extensions(loader_path: String, this_file: GDScript) -> void:
 		, CONNECT_ONE_SHOT)
 
 static func instantiate_plugin(file: GDScript):
-	file.reload()
+	file.reload(true)
 	if file.get_instance_base_type() == "EditorPlugin":
 		var plugin: EditorPlugin = file.new()
 		if editor_plugin_holder:

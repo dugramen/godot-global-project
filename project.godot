@@ -19,23 +19,9 @@ run/main_scene="res://node.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 config/icon="res://icon.svg"
 
-[dialogue_manager]
-
-general/custom_test_scene_path="res://extensions/dialogue_manager/test_scene.tscn"
-
-[editor_plugins]
-
-enabled=PackedStringArray("res://addons/folder-highlighter/plugin.cfg", "res://addons/zylann.editor_debugger/plugin.cfg")
-
 [file_customization]
 
 folder_colors={
-"res://addons/explore-editor-theme/": "green",
-"res://addons/folder-highlighter": "red",
-"res://addons/folder-highlighter/": "red",
-"res://addons/sprite_painter": "red",
-"res://addons/ui_design_tool/": "orange",
-"res://addons/zylann.editor_debugger": "red",
 "res://addons/zylann.editor_debugger/": "yellow"
 }
 
