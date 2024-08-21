@@ -1,16 +1,16 @@
 @tool
 
-static var _render_map := {}
-static var _deletion_map := {}
-static var _new_deletion_map := {}
-static var _current_callable: Callable
-static var hello := "World!"
+var _render_map := {}
+var _deletion_map := {}
+var _new_deletion_map := {}
+var _current_callable
+#static var hello := "World!"
 
-static func get_this_render() -> Callable:
+func get_this_render() -> Callable:
 	return render.bind(_current_callable)
 
-static func render(callable: Callable = _current_callable):
-	var pc := _current_callable
+func render(callable: Callable = _current_callable):
+	var pc = _current_callable
 	_current_callable = callable
 	var tree: Array = callable.call()
 	var dm: Dictionary = _deletion_map.get_or_add(callable, {})
@@ -30,7 +30,7 @@ static func render(callable: Callable = _current_callable):
 	_current_callable = pc
 	return result
 
-static func _build_element(callable: Callable, tree: Array, context := {node = null, index = 0}):
+func _build_element(callable: Callable, tree: Array, context := {node = null, index = 0}):
 	if tree.is_empty(): return
 	if tree[0] is Node or "new" in tree[0]:
 		var props := {}
@@ -112,7 +112,7 @@ static func _build_element(callable: Callable, tree: Array, context := {node = n
 								a9 = null
 							):
 								var args := [a0, a1, a2, a3, a4, a5, a6, a7, a8, a9]
-								var old_c := _current_callable
+								var old_c = _current_callable
 								_current_callable = callable
 								value.callv(args.slice(0, value.get_argument_count()))
 								_current_callable = old_c
@@ -160,7 +160,7 @@ static func _build_element(callable: Callable, tree: Array, context := {node = n
 			result.append(_build_element(callable, branch, context))
 		return result
 
-static func map_i(arr: Array, callable: Callable):
+func map_i(arr: Array, callable: Callable):
 	var result := []
 	for i in arr.size():
 		var args := [arr[i], i, arr]

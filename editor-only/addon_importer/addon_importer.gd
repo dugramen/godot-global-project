@@ -4,7 +4,7 @@ extends EditorPlugin
 #var gdx := preload("D:/Godot/global-extensions//extensions/included/gdx.gd")
 #var local_loader = load("res://loader.gd")
 #var Loader := preload("D:/Godot/global-extensions//loader.gd")
-var gdx := preload("D:/Godot/global-extensions//editor-only/addon_importer/gdx.gd")
+var gdx := preload("D:/Godot/global-extensions//editor-only/addon_importer/gdx.gd").new()
 #var chok = preload("D:/Godot/global-extensions//extensions/../extensions/addon_importer/gdx.gd")
 
 var global_extension_path := "D:/godot/global-extensions"
@@ -221,7 +221,7 @@ func _enter_tree() -> void:
 	#print('abs loader ', Loader.resource_path)
 	
 	modify_folder_color_text()
-	return
+	#return
 	
 	if global_extension_path == local_project_path: 
 		return
