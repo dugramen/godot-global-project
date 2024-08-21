@@ -344,6 +344,7 @@ func _enter_tree() -> void:
 		update_dir_map.call()
 		popup.popup_centered()
 	ProjectSettings.set_setting(show_on_startup_setting, false)
+	ProjectSettings.save()
 	add_tool_menu_item("Addon Importer", popup.popup_centered)
 
 func _exit_tree() -> void:
