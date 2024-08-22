@@ -91,6 +91,7 @@ func process_extension(file: GDScript, global_path := ProjectSettings.globalize_
 		index += 1
 	 
 	file.source_code = new_source_code 
+	ResourceSaver.save(file)
 	#prints(file, file.resource_path)
 	#file.reload()
 

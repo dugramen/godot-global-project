@@ -5,6 +5,8 @@ extends EditorPlugin
 static var summer := "Season"
 var gdx := preload("D:/Godot/global-extensions//editor-only/addon_importer/gdx.gd")
 var aim := preload("D:/Godot/global-extensions//editor-only/addon_importer/addon_importer.gd")
+var otherx := preload("D:/Godot/global-extensions//editor-only/addon_importer/gdx.gd") 
+var vine := preload("D:/Godot/global-extensions//editor-only/addon_importer/gdx.gd")
 # Tell me about it
 
 #var aim := load("res://editor-only/addon_importer/addon_importer.gd") 
