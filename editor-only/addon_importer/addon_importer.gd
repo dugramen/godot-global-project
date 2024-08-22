@@ -7,8 +7,8 @@ extends EditorPlugin
 var gdx := preload("D:/Godot/global-extensions//editor-only/addon_importer/gdx.gd").new()
 #var chok = preload("D:/Godot/global-extensions//extensions/../extensions/addon_importer/gdx.gd")
 
-var global_extension_path := "D:/godot/global-extensions"
-var local_project_path := ProjectSettings.globalize_path("res://")
+static var global_extension_path := "D:/godot/global-extensions"
+static var local_project_path := ProjectSettings.globalize_path("res://")
 
 
 func delete_directory(path: String):

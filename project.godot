@@ -21,7 +21,7 @@ config/icon="res://icon.svg"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/zylann.editor_debugger/plugin.cfg")
+enabled=PackedStringArray("res://addons/zylann.editor_debugger/plugin.cfg", "res://static_init/plugin.cfg")
 
 [rendering]
 

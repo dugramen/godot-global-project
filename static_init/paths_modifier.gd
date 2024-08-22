@@ -1,28 +1,35 @@
 @tool
 extends EditorPlugin
 
-
 static func _static_init() -> void:
-	process_all_extensions()
-	var main := EditorInterface.get_base_control()
-	var parent := main.get_parent()
-	var node_name := "global_extension_processor_plugin"
-	if parent.has_node(node_name):
-		parent.get_node(node_name).free()
-	var child := new()
-	child.name = node_name
-	parent.add_child(child)
-	print(child)
+	print("static initted")
+	EditorInterface.set_plugin_enabled("res://static_init/plugin.cfg", false)
+	EditorInterface.set_plugin_enabled("res://static_init/plugin.cfg", true)
+	 
 
 
-static func process_all_extensions() -> void:
-	var paths := ["res://extensions"]
+#static func _static_init() -> void:
+	#process_all_extensions()
+	#var main := EditorInterface.get_base_control()
+	#var parent := main.get_parent()
+	#var node_name := "global_extension_processor_plugin"
+	#if parent.has_node(node_name):
+		#parent.get_node(node_name).free()
+	#var child := new()
+	#child.name = node_name
+	#parent.add_child(child)
+	#print(child)
+
+
+func process_all_extensions() -> void:
+	var paths := ["res://editor-only"]
 	var global_path := ProjectSettings.globalize_path("res://")
 	while paths.size() > 0:
 		var path: String = paths.pop_back()
 		for dir_name in DirAccess.get_directories_at(path):
 			paths.push_back(path + "/" + dir_name)
 		for file_name in DirAccess.get_files_at(path):
+			if !file_name.ends_with(".gd"): continue
 			var file_path := path + "/" + file_name
 			var file = load(file_path)
 			if file is GDScript:
@@ -31,14 +38,6 @@ static func process_all_extensions() -> void:
 
 func _enable_plugin() -> void:
 	print("_enable_plugin")
-
-func _forward_canvas_gui_input(event: InputEvent) -> bool:
-	print(event)
-	return false
-
-func _handles(object: Object) -> bool:
-	print("handles")
-	return object is Control
 
 func _enter_tree() -> void:
 	print('entered tree')
@@ -57,11 +56,11 @@ func on_resource_saved(resource: Resource):
 	var rfs := EditorInterface.get_resource_filesystem()
 	var script_editor := EditorInterface.get_script_editor()
 	if resource is GDScript:
-		if resource.resource_path.begins_with("res://extensions/"):
+		if resource.resource_path.begins_with("res://editor-only/"):
 			if resource in script_editor.get_open_scripts():
 				process_extension(resource)
 
-static func process_extension(file: GDScript, global_path := ProjectSettings.globalize_path("res://")):
+func process_extension(file: GDScript, global_path := ProjectSettings.globalize_path("res://")):
 	var new_source_code: String = file.source_code
 	var index := 0
 	var file_path := file.resource_path

@@ -43,15 +43,19 @@ static func init_extensions(loader_path: String, this_file: GDScript) -> void:
 					for file_name in DirAccess.get_files_at(global_path.path_join(path)):
 						var file_path := global_path.path_join(path).path_join(file_name)
 						if file_name.ends_with(".gd"):
-							var file := GDScript.new()
+							#var file := GDScript.new()
+							var file = load(file_path)
+							if file is GDScript:
+								instantiate_plugin(file)
+							#file.take_over_path(file_path)
 							#file.take_over_path("res://".path_join(path).path_join(file_name))
-							file.source_code = FileAccess.get_file_as_string(file_path)
-							process_extension(file, global_path)
+							#file.source_code = FileAccess.get_file_as_string(file_path)
+							#process_extension(file, global_path)
 							#print('takeover - ', "res://".path_join(path).path_join(file_name))
 							#file.reload.call_deferred()
-							scripts.push_back(file)
+							#scripts.push_back(file)
 				
-				await main_loop.process_frame
+				#await main_loop.process_frame
 				#print(load("res://editor-only/addon_importer/gdx.gd"))
 				#print(load("res://editor-only/testing/tester.gd"))
 				#print(load("res://editor-only/addon_importer/addon_importer.gd"))
@@ -63,7 +67,7 @@ static func init_extensions(loader_path: String, this_file: GDScript) -> void:
 		, CONNECT_ONE_SHOT)
 
 static func instantiate_plugin(file: GDScript):
-	file.reload(true)
+	#file.reload(true)
 	if file.get_instance_base_type() == "EditorPlugin":
 		var plugin: EditorPlugin = file.new()
 		if editor_plugin_holder:
