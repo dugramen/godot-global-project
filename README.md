@@ -12,7 +12,14 @@ This is not an addon, but a project for you to keep on your system. All you need
 #### `editor-only`
 - In this folder you store scripts that extend `EditorPlugin`. They will be loaded, instantiated, and ran in the editor every time. But they will not be available to projects, only the editor.
 #### `addons`  
-- Store normal addons in here, even ones from the AssetLib. There are various options for how these addons should be (automatically) imported, depending on folder colors. More on that later.
+- Store normal addons in here, even ones from the AssetLib. There are various options for how these addons should be (automatically) imported, depending on folder colors.
+
+| Color | Behavior |
+| --- | --- |
+| $${\color{lightblue}Default}$$ | By default, addons won't be automatically imported. <br/><br/> Instead, a popup will appear once per project, prompting you to select which addons to import. The list will show all the addons in `addons` directory of the global project. <br/><br/> If you need to see the popup again, for example to import new addons or update existing ones, go to **`Project > Tools > Adddon Importer`**. |
+| $${\color{red}Red}$$ | This is for locally developed addons |
+| $${\color{orange}Orange}$$ | This is for asset store addons |
+| $${\color{yellow}Yellow}$$ | This is for compatability with some addons |
 #### `project-manager` 
 - Eventually you will be able to make project manager plugins. I'm just not sure what people would want from them yet
 - All other files and directories can be ignored. They're either for testing or they handle all the globalization 
