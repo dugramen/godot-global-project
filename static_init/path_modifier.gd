@@ -3,8 +3,8 @@ extends EditorPlugin
 
 static func _static_init() -> void:
 	print("static initted")
-	EditorInterface.set_plugin_enabled("res://static_init/plugin.cfg", false)
-	EditorInterface.set_plugin_enabled("res://static_init/plugin.cfg", true)
+	EditorInterface.set_plugin_enabled("res://static_init/path_modifier.cfg", false)
+	EditorInterface.set_plugin_enabled("res://static_init/path_modifier.cfg", true)
 	 
 
 
@@ -42,21 +42,22 @@ func _enable_plugin() -> void:
 func _enter_tree() -> void:
 	print('entered tree')
 	process_all_extensions()
-	resource_saved.connect(
-		func(a):
-			print("ayyyyyy save me ", a)
-	) 
+	#resource_saved.connect(
+		#func(a):
+			#print("ayyyyyy save me ", a)
+	#) 
 	
 	resource_saved.connect(on_resource_saved)
 	# Initialization of the plugin goes here.
 	pass
 
 func on_resource_saved(resource: Resource):
-	print('resource saved ', resource)
-	var rfs := EditorInterface.get_resource_filesystem()
-	var script_editor := EditorInterface.get_script_editor()
+	#print('resource saved ', resource)
 	if resource is GDScript:
+		var rfs := EditorInterface.get_resource_filesystem()
+		var script_editor := EditorInterface.get_script_editor()
 		if resource.resource_path.begins_with("res://editor-only/"):
+			print("script processed ", resource)
 			if resource in script_editor.get_open_scripts():
 				process_extension(resource)
 

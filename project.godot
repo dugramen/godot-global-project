@@ -21,7 +21,13 @@ config/icon="res://icon.svg"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/zylann.editor_debugger/plugin.cfg", "res://static_init/plugin.cfg")
+enabled=PackedStringArray("res://static_init/folder_color.cfg", "res://static_init/path_modifier.cfg")
+
+[file_customization]
+
+folder_colors={
+"res://addons/script-dock/": "orange"
+}
 
 [rendering]
 

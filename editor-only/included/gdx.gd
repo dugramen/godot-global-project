@@ -1,15 +1,15 @@
 @tool
 
-var _render_map := {}
-var _deletion_map := {}
-var _new_deletion_map := {}
-var _current_callable
+static var _render_map := {}
+static var _deletion_map := {}
+static var _new_deletion_map := {}
+static var _current_callable
 #static var hello := "World!"
 
-func get_this_render() -> Callable:
+static func get_this_render() -> Callable:
 	return render.bind(_current_callable)
 
-func render(callable: Callable = _current_callable):
+static func render(callable: Callable = _current_callable):
 	var pc = _current_callable
 	_current_callable = callable
 	var tree: Array = callable.call()
@@ -30,7 +30,7 @@ func render(callable: Callable = _current_callable):
 	_current_callable = pc
 	return result
 
-func _build_element(callable: Callable, tree: Array, context := {node = null, index = 0}):
+static func _build_element(callable: Callable, tree: Array, context := {node = null, index = 0}):
 	if tree.is_empty(): return
 	if tree[0] is Node or "new" in tree[0]:
 		var props := {}
@@ -160,7 +160,7 @@ func _build_element(callable: Callable, tree: Array, context := {node = null, in
 			result.append(_build_element(callable, branch, context))
 		return result
 
-func map_i(arr: Array, callable: Callable):
+static func map_i(arr: Array, callable: Callable):
 	var result := []
 	for i in arr.size():
 		var args := [arr[i], i, arr]
