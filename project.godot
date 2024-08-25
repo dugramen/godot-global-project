@@ -8,13 +8,9 @@
 
 config_version=5
 
-[addon_importer]
-
-show_on_startup=false
-
 [application]
 
-config/name="global-extensions"
+config/name="global-project"
 run/main_scene="res://node.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 config/icon="res://icon.svg"
@@ -22,12 +18,6 @@ config/icon="res://icon.svg"
 [editor_plugins]
 
 enabled=PackedStringArray("res://static_init/folder_color.cfg", "res://static_init/path_modifier.cfg")
-
-[file_customization]
-
-folder_colors={
-"res://addons/script-dock/": "orange"
-}
 
 [rendering]
 

@@ -2,7 +2,7 @@
 extends EditorPlugin
 
 static func _static_init() -> void:
-	print("static initted")
+	#print("static initted")
 	EditorInterface.set_plugin_enabled("res://static_init/path_modifier.cfg", false)
 	EditorInterface.set_plugin_enabled("res://static_init/path_modifier.cfg", true)
 	 
@@ -36,11 +36,11 @@ func process_all_extensions() -> void:
 				process_extension(file, global_path)
 		#print(path) 
 
-func _enable_plugin() -> void:
-	print("_enable_plugin")
+#func _enable_plugin() -> void:
+	#print("_enable_plugin")
 
 func _enter_tree() -> void:
-	print('entered tree')
+	#print('entered tree')
 	process_all_extensions()
 	#resource_saved.connect(
 		#func(a):

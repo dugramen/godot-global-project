@@ -10,25 +10,25 @@ static func _static_init() -> void:
 var menu: PopupMenu
 
 func _enter_tree() -> void:
-	print("folder plugin entered")
+	#print("folder plugin entered")
 	modify_folder_color_text() 
 
 func _exit_tree() -> void:
-	print("folder plugin exited")
+	#print("folder plugin exited")
 	if menu:
 		if menu.about_to_popup.is_connected(handle_menu_popup):
-			print('disconnecting menu')
+			#print('disconnecting menu')
 			menu.about_to_popup.disconnect(handle_menu_popup)
 
 func modify_folder_color_text():
 	var dock := EditorInterface.get_file_system_dock()
 	menu = dock.get_child(2, true)
 	if menu:
-		print(menu)
-		print(menu.item_count)
-		print(menu.get_children(true))
-		for i in menu.item_count:
-			print(menu.get_item_text(i))
+		#print(menu)
+		#print(menu.item_count)
+		#print(menu.get_children(true))
+		#for i in menu.item_count:
+			#print(menu.get_item_text(i))
 		menu.about_to_popup.connect(handle_menu_popup)
 
 func handle_menu_popup():

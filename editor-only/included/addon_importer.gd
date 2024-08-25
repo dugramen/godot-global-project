@@ -18,7 +18,7 @@ func import_by_colors():
 	var project_settings := ConfigFile.new()
 	project_settings.load(Paths.global.path_join("project.godot"))
 	var folder_colors: Dictionary = project_settings.get_value("file_customization", "folder_colors", {})
-	print(folder_colors)
+	#print(folder_colors)
 	
 	#var file_extension := '.global-red'
 	
@@ -40,10 +40,10 @@ func import_by_colors():
 			EditorInterface.set_plugin_enabled(plugin_path, false)
 			#plugins_to_enable.push_back(path.path_join("plugin.cfg"))
 		if FileAccess.file_exists(path.path_join(".global-red")):
-			print('deleting ', dir_name)
+			#print('deleting ', dir_name)
 			delete_directory(Paths.local.path_join("addons").path_join(dir_name))
 		elif FileAccess.file_exists(path.path_join(".global-orange")):
-			print('deleting ', dir_name)
+			#print('deleting ', dir_name)
 			delete_directory(Paths.local.path_join("addons").path_join(dir_name))
 	
 	for addon_path in DirAccess.get_directories_at(Paths.global.path_join("addons")):
@@ -67,10 +67,10 @@ func import_by_colors():
 				nfg.load(glb_cfg_path)
 				var new_version = nfg.get_value("plugin", "version", "")
 				
-				print(Paths.global.path_join("addons").path_join(addon_path))
-				print("versions : ", [old_version, new_version])
+				#print(Paths.global.path_join("addons").path_join(addon_path))
+				#print("versions : ", [old_version, new_version])
 				if old_version == new_version:
-					print("versions match. Skipping copy")
+					print("Versions match. Skipping copy")
 					continue
 				#var new_version = 
 			
@@ -82,7 +82,7 @@ func import_by_colors():
 			#print(tracker_file.save(res_path.path_join(file_extension)))
 			#print("saved global red")
 		
-		print('copying ', addon_path)
+		#print('copying ', addon_path)
 		
 		var plugin_path := res_path.path_join("plugin.cfg")
 		if FileAccess.file_exists(plugin_path):
@@ -214,7 +214,7 @@ func _enter_tree() -> void:
 	if Paths.global == Paths.local: 
 		return
 	
-	print(gdx.map_i([1, 2, 3], func(a): return "num-" + str(a)))
+	#print(gdx.map_i([1, 2, 3], func(a): return "num-" + str(a)))
 	
 	await import_by_colors()
 	
@@ -336,5 +336,5 @@ func _enter_tree() -> void:
 	add_tool_menu_item("Addon Importer", popup.popup_centered)
 
 func _exit_tree() -> void:
-	print('exiting')
+	#print('exiting')
 	remove_tool_menu_item("Addon Importer")
