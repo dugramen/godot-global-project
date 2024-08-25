@@ -1,20 +1,25 @@
-# Godot Global Extensions
-A way to make true Global Extensions for the Godot Game Engine. 
+# Godot Global Project
+A way to make true Global Plugins for the Godot Game Engine. 
 
 ## Installation
-This is not an addon, but a project for you to keep on your system. All you need to do is open this project in godot, and a script will be injected into EditorSettings. <br/>
-Your extensions are then global, loaded by that script every time you open Godot
+This is not an addon, but a project for you to keep on your system. All you need to do is open this project in godot, and a script will be injected into EditorSettings. From there:
 
-## Overview
-- `Extensions:` These are Editor only extensions that automatically run inside the Editor in every project
-- `Addons:` These are traditional addons. `addon_importer` is an included extension that asks which addons to import when first opening a project
-- `GDX:` Is an included UI framework for easily creating GUI from gdscript. It helps overcome some loading limitations
+- Your `editor-only` plugins are global, running in the Editor every time you open a project.
+- Your `addons` will be imported & enabled when projects load, depending on what color you assign their folders.
+- Your `project-manager` plugins will run alongside the project manager.
 
-## Differences from `globalize-plugins`
-Earlier this year I made an addon called `globalize-plugins`. It required you to install the addon into every project, which would then copy over a user-defined list of addons. `Global Extensions` succeeds that plugin. Now:
-- `Extensions` are truly global, and will run in every project wihtout the user needing to install / enable anything. They are also loaded from the disk instead of copied over, making them \**Editor Only*\*
-- `Addons` work similarly to `globalize-plugins`, except that they are only copied over from this `/adddons` directory.
-   - When you open a new project project, you will be shown a prompt asking which addons you want to import. This will appear once per project, but can be accessed again from `Project > Tools > Addon Importer`
+## Folder Overview
+#### `editor-only`
+- In this folder you store scripts that extend `EditorPlugin`. They will be loaded, instantiated, and ran in the editor every time. But they will not be available to projects, only the editor.
+#### `addons`  
+- Store normal addons in here, even ones from the AssetLib. There are various options for how these addons should be (automatically) imported, depending on folder colors. More on that later.
+#### `project-manager` 
+- Eventually you will be able to make project manager plugins. I'm just not sure what people would want from them yet
+- All other files and directories can be ignored. They're either for testing or they handle all the globalization 
+
+## Differences from `globalize-plugins` addon
+You may be familiar with the `globalize-plugins` addon I released earlier this year. This succeeds that in a few ways:
+- dcc
 
 # Making Extensions
 > [!NOTE]
