@@ -16,10 +16,10 @@ This is not an addon, but a project for you to keep on your system. All you need
 
 | Color | Behavior |
 | --- | --- |
-| $${\color{lightblue}Default}$$ | By default, addons won't be automatically imported. <br/><br/> Instead, a popup will appear once per project, prompting you to select which addons to import. The list will show all the addons in `addons` directory of the global project. <br/><br/> If you need to see the popup again, for example to import new addons or update existing ones, go to **`Project > Tools > Adddon Importer`**. |
-| $${\color{red}Red}$$ | This is for locally developed addons |
-| $${\color{orange}Orange}$$ | This is for asset store addons |
-| $${\color{yellow}Yellow}$$ | This is for compatability with some addons |
+| $${\color{lightblue}Default}$$ | By default, addons won't be automatically imported. <br/><br/> Instead, a popup will appear once per project, prompting you to select which addons to import. The list will show all the addons in `addons` directory of the global project. <br/><br/> If you need to see the popup again, for example to import new addons or update existing ones, go to **`Project > Tools > Adddon Importer`**.<br/> |
+| $${\color{red}Red}$$ | This is ideal if you're developing & testing your own addons locally. <br/> Red addons are synced exactly as they appear in the global project. <br/><br/> On load, they are deleted, and then copied over again. <br/> This means if addons are no longer Red in the global project, they will no longer exist in your other projects. <br/> |
+| $${\color{orange}Orange}$$ | This is recommended for asset store addons. <br/><br/> Only when the version in plugin.cfg has changed, the addons are deleted, then copied over. <br/> Addons that are no longer Orange will also be deleted. <br/><br/> This method makes it so files aren't copied over every time. <br/> |
+| $${\color{yellow}Yellow}$$ | This is for compatability with certain addons. <br/> This is also the same behavior as my old 'globalize-plugins' addon. <br/><br/> On load, all yellow plugins are copied over, but nothing is deleted. <br/> Folders that are no longer yellow will still remain. <br/> Even if the addon's file structure / naming changes, the outdated files and folders will remain. <br/><br/> Some addons store user data / preferences within its directory. <br/> Red and Orange addons would keep overwriting those preferences, but Yellows won't. <br/> |
 #### `project-manager` 
 - Eventually you will be able to make project manager plugins. I'm just not sure what people would want from them yet
 - All other files and directories can be ignored. They're either for testing or they handle all the globalization 
