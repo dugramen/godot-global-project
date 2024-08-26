@@ -37,7 +37,7 @@ func _enter_tree() -> void:
 				keep_title_visible = true,
 				unresizable = false,
 			}, [
-				[HBoxContainer, [
+				[HSplitContainer, [
 					[VBoxContainer, {
 						size_flags_horizontal = Control.SIZE_EXPAND_FILL,
 						size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -79,6 +79,24 @@ func _enter_tree() -> void:
 													inspected_node = item
 													gdx.render()
 													pass,
+												on_mouse_entered = func():
+													if item is Control:
+														if topmost_node:
+															topmost_node.queue_redraw()
+														topmost_node = item
+														hovered_nodes[item] = true
+														item.queue_redraw()
+													,
+												on_mouse_exited = func():
+													if item is Control:
+														if topmost_node:
+															topmost_node.queue_redraw()
+														if topmost_node == item:
+															topmost_node = null
+														hovered_nodes.erase(item)
+														item.queue_redraw()
+													,
+												icon = get_theme_icon(item.get_class(), "EditorIcons")
 											}]
 										]],
 										[MarginContainer, {
@@ -107,9 +125,9 @@ func _enter_tree() -> void:
 								text = str(inspected_node.get_path()),
 								clip_text = true,
 							}],
-							[Label, {
-								text = "Hello end"
-							}],
+							#[Label, {
+								#text = "Hello end"
+							#}],
 							[ScrollContainer, {
 								size_flags_vertical = Control.SIZE_EXPAND_FILL,
 								size_flags_horizontal = Control.SIZE_EXPAND_FILL,
