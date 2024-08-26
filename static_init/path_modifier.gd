@@ -56,7 +56,7 @@ func on_resource_saved(resource: Resource):
 	if resource is GDScript:
 		var rfs := EditorInterface.get_resource_filesystem()
 		var script_editor := EditorInterface.get_script_editor()
-		if resource.resource_path.begins_with("res://editor-only/"):
+		if resource.resource_path.begins_with("res://editor-only/") or resource.resource_path.begins_with("res://project-manager/"):
 			print("script processed ", resource)
 			if resource in script_editor.get_open_scripts():
 				process_extension(resource)

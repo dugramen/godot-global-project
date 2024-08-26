@@ -35,36 +35,34 @@ static func init_extensions(loader_path: String, this_file: GDScript) -> void:
 				var paths := ["editor-only"]
 				while !paths.is_empty():
 					var path: String = paths.pop_back()
-					#print(path)
-					#print(global_path.path_join(path))
-					#print(DirAccess.get_directories_at(global_path.path_join(path)))
 					for dir_name in DirAccess.get_directories_at(global_path.path_join(path)):
 						paths.push_back(path.path_join(dir_name))
 					for file_name in DirAccess.get_files_at(global_path.path_join(path)):
 						var file_path := global_path.path_join(path).path_join(file_name)
 						if file_name.ends_with(".gd"):
-							#var file := GDScript.new()
 							var file = load(file_path)
 							if file is GDScript:
 								instantiate_plugin(file)
-							#file.take_over_path(file_path)
-							#file.take_over_path("res://".path_join(path).path_join(file_name))
-							#file.source_code = FileAccess.get_file_as_string(file_path)
-							#process_extension(file, global_path)
-							#print('takeover - ', "res://".path_join(path).path_join(file_name))
-							#file.reload.call_deferred()
-							#scripts.push_back(file)
-				
-				#await main_loop.process_frame
-				#print(load("res://editor-only/addon_importer/gdx.gd"))
-				#print(load("res://editor-only/testing/tester.gd"))
-				#print(load("res://editor-only/addon_importer/addon_importer.gd"))
-				for file in scripts:
-					instantiate_plugin.call_deferred(file)
-				
-				## Move into addon importer plugin
-				
+			else:
+				print("project manager?")
+				var root: Node = main_loop.root
+				global_path = loader_path.trim_suffix("loader.gd")
+				var paths := [global_path.path_join("project-manager")]
+				while !paths.is_empty():
+					var path: String = paths.pop_back() as String
+					for dir_name in DirAccess.get_directories_at(path):
+						paths.push_back(path.path_join(dir_name))
+					for file_name in DirAccess.get_files_at(path):
+						var file_path := path.path_join(file_name)
+						if file_name.ends_with(".gd"):
+							var file = load(file_path)
+							if file is GDScript:
+								var instance: Object = file.new()
+								prints('project plugin ', file, instance)
+								if instance is Node:
+									root.add_child(instance)
 		, CONNECT_ONE_SHOT)
+
 
 static func instantiate_plugin(file: GDScript):
 	#file.reload(true)
