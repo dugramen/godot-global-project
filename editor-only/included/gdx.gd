@@ -1,16 +1,16 @@
 @tool
 
-static var _render_map := {}
-static var _deletion_map := {}
-static var _new_deletion_map := {}
-static var _current_callable
+var _render_map := {}
+var _deletion_map := {}
+var _new_deletion_map := {}
+var _current_callable
 #static var hello := "World!"
 
-static func get_this_render() -> Callable:
+func get_this_render() -> Callable:
 	return render.bind(_current_callable)
 
-static func render(callable: Callable = _current_callable):
-	var pc = _current_callable
+func render(callable: Callable = _current_callable):
+	#var pc = _current_callable
 	_current_callable = callable
 	var tree: Array = callable.call()
 	var dm: Dictionary = _deletion_map.get_or_add(callable, {})
@@ -21,16 +21,19 @@ static func render(callable: Callable = _current_callable):
 		node_from_previous_render = node_from_previous_render.get_parent()
 		index = node_from_previous_render.get_index()
 	var result = _build_element(callable, tree, {index = index, node = node_from_previous_render})
+	if result is Array:
+		if result.size() > 0:
+			result = result[0]
 	_render_map[callable] = result
 	for node in dm:
 		if is_instance_valid(node):
 			node.queue_free()
 	_deletion_map[callable] = ndm
 	_new_deletion_map.erase(callable)
-	_current_callable = pc
+	#_current_callable = pc
 	return result
 
-static func _build_element(callable: Callable, tree: Array, context := {node = null, index = 0}):
+func _build_element(callable: Callable, tree: Array, context := {node = null, index = 0}):
 	if tree.is_empty(): return
 	if tree[0] is Node or "new" in tree[0]:
 		var props := {}
@@ -124,15 +127,18 @@ static func _build_element(callable: Callable, tree: Array, context := {node = n
 						node.call("add_" + key + "_override", p, value[p])
 					continue
 				if key in node:
-					if node.get(key) != value:
+					var curr = node.get(key)
+					if typeof(curr) != typeof(value) or curr != value:
 						node.set(key, value)
 						continue
 					continue
-					
+				
+				#print('getting indexed')
+				#node.has_node_and_resource()
 				var indexed_val = node.get_indexed(key)
 				if typeof(indexed_val) == typeof(value):
 					#print('proped')
-					if node.get_indexed(key) != value:
+					if indexed_val != value:
 						node.set_indexed(key, value)
 						continue
 					continue
@@ -163,6 +169,6 @@ static func _build_element(callable: Callable, tree: Array, context := {node = n
 static func map_i(arr: Array, callable: Callable):
 	var result := []
 	for i in arr.size():
-		var args := [arr[i], i, arr]
+		var args := [arr[i], i, arr, callable]
 		result.append(callable.callv(args.slice(0, callable.get_argument_count())))
 	return result

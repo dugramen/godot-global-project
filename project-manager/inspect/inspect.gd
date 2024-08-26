@@ -1,10 +1,14 @@
 extends Control
 
-var gdx := preload("D:/Godot/global-extensions//editor-only/included/gdx.gd")
+var gdx := preload("D:/Godot/global-extensions//editor-only/included/gdx.gd").new()
 
 var topmost_node: Control
 var hovered_nodes := {}
 var all_controls := {}
+
+var inspected_node: Node
+var popup := PopupPanel.new() 
+
 
 func _enter_tree() -> void:
 	print("I was spawned")
@@ -24,26 +28,128 @@ func _enter_tree() -> void:
 	
 	get_tree().node_added.connect(connect_node)
 	
-	var popup := PopupPanel.new() 
 	gdx.render(func(): return ([
 		[self, [
 			[popup, {
 				popup_window = false, 
-				title = "Please wait",
+				title = "Inspect Nodes",
 				borderless = false,
 				keep_title_visible = true,
+				unresizable = false,
 			}, [
-				#[Panel, func(it: Panel): it.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)],
-				[VBoxContainer, [
-					[Label, {text = "Inspector"}]
-				]]
+				[HBoxContainer, [
+					[VBoxContainer, {
+						size_flags_horizontal = Control.SIZE_EXPAND_FILL,
+						size_flags_vertical = Control.SIZE_EXPAND_FILL
+					}, [
+						[ScrollContainer, {
+							#"custom_minimum_size" = Vector2(100, 200),
+							size_flags_vertical = Control.SIZE_EXPAND_FILL,
+							size_flags_horizontal = Control.SIZE_EXPAND_FILL,
+						}, [
+							[VBoxContainer, [
+								[Label, {text = "Inspector"}],
+								gdx.map_i([root], func(item: Node, index, array, callable): 
+									if item == self or self.is_ancestor_of(item):
+										return []
+									return (
+									[VBoxContainer, [
+										[HBoxContainer, {
+											size_flags_horizontal = Control.SIZE_EXPAND_FILL,
+											theme_constant = {}
+										}, [
+											[Button, {
+												text = (
+													#">" if item.get_child_count(true) == 0 else 
+													"v" if item.get_meta("expanded", false) else
+													">"
+												),
+												visible = false if item.get_child_count(true) == 0 else true,
+												#alignment = HORIZONTAL_ALIGNMENT_LEFT,
+												on_pressed = func():
+													item.set_meta('expanded', !item.get_meta('expanded', false))
+													gdx.render()
+													pass,
+											}],
+											[Button, {
+												size_flags_horizontal = Control.SIZE_EXPAND_FILL,
+												alignment = HORIZONTAL_ALIGNMENT_LEFT,
+												text = item.name,
+												on_pressed = func():
+													inspected_node = item
+													gdx.render()
+													pass,
+											}]
+										]],
+										[MarginContainer, {
+											theme_constant = {
+												margin_left = 16
+											}
+										}, [
+											[VBoxContainer, [
+												gdx.map_i(item.get_children(true), callable)
+											]]
+										]] if item.get_meta("expanded", false) else []
+									]]
+								)),
+							]]
+						]],
+					]],
+					[VBoxContainer, {
+						size_flags_horizontal = Control.SIZE_EXPAND_FILL,
+						size_flags_vertical = Control.SIZE_EXPAND_FILL
+					}, [
+						[
+							[Label, {
+								text = inspected_node.name
+							}],
+							[Label, {
+								text = str(inspected_node.get_path()),
+								clip_text = true,
+							}],
+							[Label, {
+								text = "Hello end"
+							}],
+							[ScrollContainer, {
+								size_flags_vertical = Control.SIZE_EXPAND_FILL,
+								size_flags_horizontal = Control.SIZE_EXPAND_FILL,
+							}, [
+								[GridContainer, {
+									columns = 2,
+									size_flags_horizontal = Control.SIZE_EXPAND_FILL,
+									size_flags_vertical = Control.SIZE_EXPAND_FILL
+								}, [
+									gdx.map_i(
+										inspected_node.get_property_list(),
+										func(prop, index, array, callable): return (
+											[
+												[Button, {
+													text = prop.name,
+													size_flags_horizontal = Control.SIZE_EXPAND_FILL,
+													size_flags_vertical = Control.SIZE_EXPAND_FILL,
+													alignment = HORIZONTAL_ALIGNMENT_LEFT,
+													clip_text = true,
+												}],
+												[Label, {
+													text = str(inspected_node.get_indexed(prop.name)),
+													size_flags_horizontal = Control.SIZE_EXPAND_FILL,
+													clip_text = true,
+												}]
+											]
+										),
+									)
+								]]
+							]]
+						] if inspected_node else [],
+					]]
+				]],
 			]]
 		]]
 	]))
-	popup.popup_centered()
+	popup.popup_centered(Vector2(500, 400))
 
 func connect_node(node: Node):
-	if node is Control and node != self and node.get_window() == get_tree().root:
+	if node is Control and node != self and node != popup and node.get_window() == get_tree().root:
 		all_controls[node] = true
 		node.draw.connect(node_draw.bind(node))
 		#node.mouse_entered.connect(node_mouse_entered.bind(node))
@@ -51,7 +157,10 @@ func connect_node(node: Node):
 		#node.gui_input.connect(node_gui_input.bind(node))
 
 func _gui_input(event: InputEvent) -> void:
-	if event is InputEventMouseMotion:
+	if event is InputEventMouseButton and event.pressed:
+		inspected_node = topmost_node
+		gdx.render()
+	elif event is InputEventMouseMotion:
 		var recheck_top := false
 		for node: Control in all_controls:
 			if !node.is_visible_in_tree(): 

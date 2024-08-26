@@ -1,7 +1,7 @@
 @tool
 extends EditorPlugin
 
-var gdx := preload("D:/Godot/global-extensions//editor-only/included/gdx.gd")
+var gdx := preload("D:/Godot/global-extensions//editor-only/included/gdx.gd").new()
 var Paths := preload("D:/Godot/global-extensions//editor-only/included/paths.gd") 
 
 func delete_directory(path: String):
