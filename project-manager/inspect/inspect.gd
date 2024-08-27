@@ -60,7 +60,11 @@ func _enter_tree() -> void:
 				unresizable = false,
 				#mouse_passthrough = true
 			}, [
-				[HSplitContainer, [
+				[HSplitContainer, {
+					size_flags_horizontal = Control.SIZE_EXPAND_FILL,
+					size_flags_vertical = Control.SIZE_EXPAND_FILL
+					#collapsed = inspected_node == null,
+				}, [
 					[VBoxContainer, {
 						size_flags_horizontal = Control.SIZE_EXPAND_FILL,
 						size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -71,30 +75,36 @@ func _enter_tree() -> void:
 							size_flags_vertical = Control.SIZE_EXPAND_FILL,
 							size_flags_horizontal = Control.SIZE_EXPAND_FILL,
 						}, [
-							[VBoxContainer, [
+							[GridContainer, {
+								columns = 2
+							}, [
+								[Control],
 								[Label, {text = "Inspector"}],
 								gdx.map_i([root], func(item: Node, index, array, callable): 
 									if item == self or self.is_ancestor_of(item):
 										return []
-									return (
-									[VBoxContainer, [
-										[HBoxContainer, {
-											size_flags_horizontal = Control.SIZE_EXPAND_FILL,
-											theme_constant = {}
-										}, [
-											[Button, {
-												text = (
-													#">" if item.get_child_count(true) == 0 else 
-													"v" if item.get_meta("expanded", false) else
-													">"
-												),
-												visible = false if item.get_child_count(true) == 0 else true,
-												#alignment = HORIZONTAL_ALIGNMENT_LEFT,
-												on_pressed = func():
-													item.set_meta('expanded', !item.get_meta('expanded', false))
-													gdx.render()
-													pass,
-											}],
+									return ([
+										[Button, {
+											text = (
+												#">" if item.get_child_count(true) == 0 else 
+												"v" if item.get_meta("expanded", false) else
+												">"
+											),
+											disabled = true if item.get_child_count(true) == 0 else false,
+											#alignment = HORIZONTAL_ALIGNMENT_LEFT,
+											toggle_mode = true,
+											on_toggled = func(val):
+												item.set_meta('expanded', val)
+												#item.set_meta('expanded', !item.get_meta('expanded', false))
+												gdx.render()
+												pass,
+											#theme_stylebox = {
+												#disabled = {
+													#
+												#},
+											#}
+										}],
+										[VBoxContainer, [
 											[Button, {
 												size_flags_horizontal = Control.SIZE_EXPAND_FILL,
 												alignment = HORIZONTAL_ALIGNMENT_LEFT,
@@ -131,28 +141,23 @@ func _enter_tree() -> void:
 														item.queue_redraw()
 													,
 												icon = get_theme_icon(item.get_class(), "EditorIcons")
-											},  
-											func(it: Button):
+											},  func(it: Button):
 												if item.get_meta("just_grabbed_focus", false):
 													print("focused ", it)
 													it.grab_focus()
-													it.grab_click_focus()
+													#it.grab_click_focus()
 													#it.button_pressed = true
 													it.set_pressed_no_signal(true)
 													item.remove_meta("just_grabbed_focus")
 												,
-											]
-										]],
-										[MarginContainer, {
-											theme_constant = {
-												margin_left = 16
-											}
-										}, [
-											[VBoxContainer, [
+											],
+											[GridContainer, {
+												columns = 2,
+											}, [
 												gdx.map_i(item.get_children(true), callable)
-											]]
-										]] if item.get_meta("expanded", false) else []
-									]]
+											]] if item.get_meta("expanded", false) else [],
+										]],
+									]
 								)),
 							]]
 						]],
@@ -214,7 +219,7 @@ func _enter_tree() -> void:
 			#inspect_button.button_pressed = false
 			#inspect_button.set_pressed_no_signal(false)
 	)
-	popup.about_to_popup.connect(
+	popup.focus_entered.connect(
 		func():
 			topmost_node.queue_redraw()
 			topmost_node = null
