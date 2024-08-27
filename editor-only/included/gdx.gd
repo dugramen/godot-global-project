@@ -5,32 +5,38 @@ var _deletion_map := {}
 var _new_deletion_map := {}
 var _current_callable
 #static var hello := "World!"
+var confirmed_callable: Callable
 
 func get_this_render() -> Callable:
 	return render.bind(_current_callable)
 
-func render(callable: Callable = _current_callable):
-	#var pc = _current_callable
+func render(callable = null):
+	if callable == null:
+		callable = confirmed_callable
+	else:
+		confirmed_callable = callable
+	var pc = _current_callable
 	_current_callable = callable
-	var tree: Array = callable.call()
-	var dm: Dictionary = _deletion_map.get_or_add(callable, {})
-	var ndm: Dictionary = _new_deletion_map.get_or_add(callable, {})
-	var node_from_previous_render = _render_map.get(callable, null)
+	var tree: Array = _current_callable.call()
+	var dm: Dictionary = _deletion_map.get_or_add(_current_callable, {})
+	var ndm: Dictionary = _new_deletion_map.get_or_add(_current_callable, {})
+	var node_from_previous_render = _render_map.get(_current_callable, null)
 	var index := 0
 	if node_from_previous_render is Node:
 		node_from_previous_render = node_from_previous_render.get_parent()
 		index = node_from_previous_render.get_index()
-	var result = _build_element(callable, tree, {index = index, node = node_from_previous_render})
+	var result = _build_element(_current_callable, tree, {index = index, node = node_from_previous_render})
 	if result is Array:
 		if result.size() > 0:
 			result = result[0]
-	_render_map[callable] = result
+	_render_map[_current_callable] = result
 	for node in dm:
 		if is_instance_valid(node):
 			node.queue_free()
-	_deletion_map[callable] = ndm
-	_new_deletion_map.erase(callable)
-	#_current_callable = pc
+	_deletion_map[_current_callable] = ndm
+	_new_deletion_map.erase(_current_callable)
+	_current_callable = pc
+	#if pc != null:
 	return result
 
 func _build_element(callable: Callable, tree: Array, context := {node = null, index = 0}):
@@ -115,10 +121,11 @@ func _build_element(callable: Callable, tree: Array, context := {node = null, in
 								a9 = null
 							):
 								var args := [a0, a1, a2, a3, a4, a5, a6, a7, a8, a9]
-								var old_c = _current_callable
+								var current_c = _current_callable
 								_current_callable = callable
-								value.callv(args.slice(0, value.get_argument_count()))
-								_current_callable = old_c
+								value.call()
+								#value.callv(args.slice(0, value.get_argument_count()))
+								_current_callable = current_c
 							node.connect(signal_name, connection_call)
 							connections[signal_name] = connection_call
 					continue

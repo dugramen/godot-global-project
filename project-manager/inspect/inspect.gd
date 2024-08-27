@@ -9,7 +9,6 @@ var all_controls := {}
 var inspected_node: Node
 var popup := PopupPanel.new() 
 
-
 func _enter_tree() -> void:
 	print("I was spawned")
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -27,7 +26,8 @@ func _enter_tree() -> void:
 		connect_node(node)
 	
 	get_tree().node_added.connect(connect_node)
-	
+	var button_group := ButtonGroup.new()
+	button_group.allow_unpress = true
 	gdx.render(func(): return ([
 		[self, [
 			[popup, {
@@ -36,6 +36,7 @@ func _enter_tree() -> void:
 				borderless = false,
 				keep_title_visible = true,
 				unresizable = false,
+				#mouse_passthrough = true
 			}, [
 				[HSplitContainer, [
 					[VBoxContainer, {
@@ -44,6 +45,7 @@ func _enter_tree() -> void:
 					}, [
 						[ScrollContainer, {
 							#"custom_minimum_size" = Vector2(100, 200),
+							follow_focus = true,
 							size_flags_vertical = Control.SIZE_EXPAND_FILL,
 							size_flags_horizontal = Control.SIZE_EXPAND_FILL,
 						}, [
@@ -75,7 +77,13 @@ func _enter_tree() -> void:
 												size_flags_horizontal = Control.SIZE_EXPAND_FILL,
 												alignment = HORIZONTAL_ALIGNMENT_LEFT,
 												text = item.name,
-												on_pressed = func():
+												toggle_mode = true,
+												button_group = button_group,
+												#on_gui_input = func(event = null):
+													#print(event)
+													#pass,
+												on_toggled = func(v = null):
+													#if v:
 													inspected_node = item
 													gdx.render()
 													pass,
@@ -97,7 +105,17 @@ func _enter_tree() -> void:
 														item.queue_redraw()
 													,
 												icon = get_theme_icon(item.get_class(), "EditorIcons")
-											}]
+											},  
+											func(it: Button):
+												if item.get_meta("just_grabbed_focus", false):
+													print("focused ", it)
+													it.grab_focus()
+													it.grab_click_focus()
+													#it.button_pressed = true
+													it.set_pressed_no_signal(true)
+													item.remove_meta("just_grabbed_focus")
+												,
+											]
 										]],
 										[MarginContainer, {
 											theme_constant = {
@@ -177,7 +195,18 @@ func connect_node(node: Node):
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed:
 		inspected_node = topmost_node
-		gdx.render()
+		if inspected_node:
+			var nodes: Array[Node] = [inspected_node]
+			while !nodes.is_empty():
+				var node := nodes.pop_back() as Node
+				node.set_meta("expanded", true)
+				if node == get_tree().root:
+					break
+				nodes.push_back(node.get_parent())
+			popup.grab_focus()
+			popup.move_to_foreground()
+			inspected_node.set_meta("just_grabbed_focus", true)
+			gdx.render()
 	elif event is InputEventMouseMotion:
 		var recheck_top := false
 		for node: Control in all_controls:
@@ -203,7 +232,7 @@ func _gui_input(event: InputEvent) -> void:
 					topmost_node = node
 			if topmost_node:
 				topmost_node.queue_redraw()
-				print(topmost_node.get_path())
+				#print(topmost_node.get_path())
 
 
 func node_gui_input(event: InputEvent, node: Control):
