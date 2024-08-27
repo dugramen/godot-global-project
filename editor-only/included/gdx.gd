@@ -88,7 +88,9 @@ func _build_element(callable: Callable, tree: Array, context := {node = null, in
 				if parent:
 					parent.add_child(node)
 		_deletion_map[callable].erase(node)
-		_new_deletion_map[callable][node] = true
+		#_new_deletion_map.get_or_add(callable, {})[node] = true
+		if callable in _new_deletion_map:
+			_new_deletion_map[callable][node] = true
 		
 		# Disconnect signals from previous render
 		var connections: Dictionary = node.get_meta("_gdx_connections", {})
@@ -123,8 +125,8 @@ func _build_element(callable: Callable, tree: Array, context := {node = null, in
 								var args := [a0, a1, a2, a3, a4, a5, a6, a7, a8, a9]
 								var current_c = _current_callable
 								_current_callable = callable
-								value.call()
-								#value.callv(args.slice(0, value.get_argument_count()))
+								#value.call()
+								value.callv(args.slice(0, value.get_argument_count()))
 								_current_callable = current_c
 							node.connect(signal_name, connection_call)
 							connections[signal_name] = connection_call
