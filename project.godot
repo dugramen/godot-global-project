@@ -17,7 +17,7 @@ config/icon="res://icon.svg"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/explore-editor-theme/plugin.cfg", "res://static_init/folder_color.cfg", "res://static_init/path_modifier.cfg")
+enabled=PackedStringArray("res://static_init/folder_color.cfg", "res://static_init/path_modifier.cfg")
 
 [file_customization]
 

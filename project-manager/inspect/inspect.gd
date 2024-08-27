@@ -60,7 +60,7 @@ func _enter_tree() -> void:
 				unresizable = false,
 				#mouse_passthrough = true
 			}, [
-				[HSplitContainer, {
+				[HBoxContainer, {
 					size_flags_horizontal = Control.SIZE_EXPAND_FILL,
 					size_flags_vertical = Control.SIZE_EXPAND_FILL
 					#collapsed = inspected_node == null,
@@ -104,7 +104,9 @@ func _enter_tree() -> void:
 												#},
 											#}
 										}],
-										[VBoxContainer, [
+										[VBoxContainer, {
+											size_flags_horizontal = Control.SIZE_EXPAND_FILL,
+										}, [
 											[Button, {
 												size_flags_horizontal = Control.SIZE_EXPAND_FILL,
 												alignment = HORIZONTAL_ALIGNMENT_LEFT,
@@ -114,13 +116,13 @@ func _enter_tree() -> void:
 												#on_gui_input = func(event = null):
 													#print(event)
 													#pass,
-												button_pressed = inspected_node == item,
+												#button_pressed = inspected_node == item,
 												on_toggled = func(val):
 													#if v:
 													if val:
 														inspected_node = item
-													else:
-														inspected_node = null
+													#elif inspected_node == item:
+														#inspected_node = null
 													gdx.render()
 													pass,
 												on_mouse_entered = func():
@@ -164,7 +166,8 @@ func _enter_tree() -> void:
 					]],
 					[VBoxContainer, {
 						size_flags_horizontal = Control.SIZE_EXPAND_FILL,
-						size_flags_vertical = Control.SIZE_EXPAND_FILL
+						size_flags_vertical = Control.SIZE_EXPAND_FILL,
+						size_flags_stretch_ratio = .65,
 					}, [
 						[
 							[Label, {
@@ -207,8 +210,8 @@ func _enter_tree() -> void:
 									)
 								]]
 							]]
-						] if inspected_node else [],
-					]]
+						],
+					]] if inspected_node else [],
 				]],
 			]]
 		]]
@@ -259,6 +262,9 @@ func _gui_input(event: InputEvent) -> void:
 				continue
 			
 			
+			pass
+			
+			
 			var new_val := node.get_global_rect().has_point(event.position)
 			var old_val = hovered_nodes.get(node, false)
 			if new_val != old_val:
@@ -300,10 +306,10 @@ func node_mouse_exited(node: Control):
 	node.queue_redraw()
 
 func node_draw(node: Control):
-	if inspecting:
-		if hovered_nodes.get(node):
-			if node == topmost_node:
-				node.draw_rect(Rect2(Vector2(), node.size), Color(Color.RED, .5))
+	#if inspecting:
+	if hovered_nodes.get(node):
+		if node == topmost_node:
+			node.draw_rect(Rect2(Vector2(), node.size), Color(Color.RED, .5))
 		#else:
 			#node.draw_rect(Rect2(Vector2(), node.size), Color(Color.RED, .0))
 	#if node.get_meta("hovered", false):
