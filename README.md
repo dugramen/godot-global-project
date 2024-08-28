@@ -25,7 +25,23 @@ This is not an addon, but a project for you to keep on your system. All you need
 | $${\color{orange}Orange}$$ | <br/> This is recommended for asset store addons. <br/><br/> Only when the version in plugin.cfg has changed, the addons are deleted, then copied over. <br/> Addons that are no longer Orange will also be deleted. <br/><br/> This method makes it so files aren't copied over every time. <br/><br/> |
 | $${\color{yellow}Yellow}$$ | <br/> This is for compatability with certain addons. <br/> This is also the same behavior as my old 'globalize-plugins' addon. <br/><br/> On load, all yellow plugins are copied over, but nothing is deleted. <br/> Folders that are no longer yellow will still remain. <br/> Even if the addon's file structure / naming changes, the outdated files and folders will remain. <br/><br/> Some addons store user data / preferences within its directory. <br/> Red and Orange addons would keep overwriting those preferences, but Yellows won't. <br/><br/> |
 #### `project-manager` 
-- Eventually you will be able to make project manager plugins. I'm just not sure what people would want from them yet
+- This folder works the same as the `editor-only` folder, except the scripts run in the project manager instead of the editor.
+- The scripts should not extend `EditorPlugin` and should not use any function from `EditorInterface`, since those do not exist in the project manager.
+- There is no simple api for accessing parts of the UI. You'll have to access nodes manually like `Engine.get_main_loop().get_child(0).get_child(0)` etc.
+- I have created and included a `project-manager` plugin that adds an `inspect` button to the top right.
+
+![image](https://github.com/user-attachments/assets/c7e52e24-6f0d-4289-849b-ab0a908ba702)
+
+- This pops up a window that lets you view the project manager's scene tree. On the right is the selected node's property list.
+
+![image](https://github.com/user-attachments/assets/3ded6864-c9b5-4e04-99c2-551d3097a4bf)
+
+- When you've pressed `inspect`, you can also click directly on a node to view it in the tree. The hovered node will be highlighted in red.
+
+![image](https://github.com/user-attachments/assets/f46e63d9-a5c0-4547-b362-1952d3be5680)
+
+
+
 - All other files and directories can be ignored. They're either for testing or they handle all the globalization 
 
 ## Differences from `globalize-plugins` addon
