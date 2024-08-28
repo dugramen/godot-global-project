@@ -22,7 +22,8 @@ static func _static_init() -> void:
 
 
 func process_all_extensions() -> void:
-	var paths := ["res://editor-only"]
+	print("processing all extensions")
+	var paths := ["res://editor-only", "res://project-manager"]
 	var global_path := ProjectSettings.globalize_path("res://")
 	while paths.size() > 0:
 		var path: String = paths.pop_back()

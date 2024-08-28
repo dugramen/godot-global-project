@@ -3,11 +3,11 @@
 extends EditorPlugin
 
 static var summer := "Season"
-var gdx := preload("D:/Godot/global-extensions//editor-only/included/gdx.gd")
-var aim := preload("D:/Godot/global-extensions//editor-only/included/addon_importer.gd")
-var otherx := preload("D:/Godot/global-extensions//editor-only/included/gdx.gd") 
-var vine := preload("D:/Godot/global-extensions//editor-only/included/gdx.gd")
-var Paths := preload("D:/Godot/global-extensions//editor-only/included/paths.gd")
+var gdx := preload("D:/Godot/global-project//editor-only/included/gdx.gd")
+var aim := preload("D:/Godot/global-project//editor-only/included/addon_importer.gd")
+var otherx := preload("D:/Godot/global-project//editor-only/included/gdx.gd") 
+var vine := preload("D:/Godot/global-project//editor-only/included/gdx.gd")
+var Paths := preload("D:/Godot/global-project//editor-only/included/paths.gd")
 
 # Tell me about it 
 

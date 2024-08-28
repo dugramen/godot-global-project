@@ -1,6 +1,6 @@
 extends Control
 
-var gdx := preload("D:/Godot/global-extensions//editor-only/included/gdx.gd").new()
+var gdx := preload("D:/Godot/global-project//editor-only/included/gdx.gd").new()
 
 var topmost_node: Control
 var hovered_nodes := {}
@@ -13,7 +13,8 @@ var inspect_button := Button.new()
 var inspecting := false:
 	set(v):
 		if v:
-			popup.popup_centered(Vector2(500, 400))
+			if !popup.visible:
+				popup.popup_centered(Vector2(500, 400))
 			mouse_filter = MouseFilter.MOUSE_FILTER_STOP
 		else:
 			mouse_filter = MouseFilter.MOUSE_FILTER_IGNORE
@@ -47,6 +48,8 @@ func _enter_tree() -> void:
 			inspecting = true
 	)
 	
+	var scroll_container := ScrollContainer.new()
+	
 	get_tree().node_added.connect(connect_node)
 	var button_group := ButtonGroup.new()
 	button_group.allow_unpress = true
@@ -69,9 +72,9 @@ func _enter_tree() -> void:
 						size_flags_horizontal = Control.SIZE_EXPAND_FILL,
 						size_flags_vertical = Control.SIZE_EXPAND_FILL
 					}, [
-						[ScrollContainer, {
+						[scroll_container, {
 							#"custom_minimum_size" = Vector2(100, 200),
-							follow_focus = true,
+							#follow_focus = true,
 							size_flags_vertical = Control.SIZE_EXPAND_FILL,
 							size_flags_horizontal = Control.SIZE_EXPAND_FILL,
 						}, [
@@ -84,26 +87,30 @@ func _enter_tree() -> void:
 									if item == self or self.is_ancestor_of(item):
 										return []
 									return ([
-										[Button, {
-											text = (
-												#">" if item.get_child_count(true) == 0 else 
-												"v" if item.get_meta("expanded", false) else
-												">"
-											),
-											disabled = true if item.get_child_count(true) == 0 else false,
-											#alignment = HORIZONTAL_ALIGNMENT_LEFT,
-											toggle_mode = true,
-											on_toggled = func(val):
-												item.set_meta('expanded', val)
-												#item.set_meta('expanded', !item.get_meta('expanded', false))
-												gdx.render()
-												pass,
-											#theme_stylebox = {
-												#disabled = {
-													#
-												#},
-											#}
-										}],
+										[MarginContainer, [
+											[Button, {
+												disabled = true if item.get_child_count(true) == 0 else false,
+												#alignment = HORIZONTAL_ALIGNMENT_LEFT,
+												toggle_mode = true,
+												on_toggled = func(val):
+													item.set_meta('expanded', val)
+													#item.set_meta('expanded', !item.get_meta('expanded', false))
+													gdx.render()
+													pass,
+												#theme_stylebox = {
+													#disabled = {
+														#
+													#},
+												#}
+											}],
+											[Label, {
+												text = (
+													"v" if item.get_meta("expanded", false) else ">"
+												),
+												mouse_filter = MOUSE_FILTER_IGNORE,
+												size_flags_vertical = SIZE_SHRINK_BEGIN,
+											}]
+										]],
 										[VBoxContainer, {
 											size_flags_horizontal = Control.SIZE_EXPAND_FILL,
 										}, [
@@ -145,7 +152,9 @@ func _enter_tree() -> void:
 												icon = get_theme_icon(item.get_class(), "EditorIcons")
 											},  func(it: Button):
 												if item.get_meta("just_grabbed_focus", false):
-													print("focused ", it)
+													var offset := it.global_position - scroll_container.global_position
+													scroll_container.scroll_vertical = offset.y
+													prints("focused pos ", it, offset)
 													it.grab_focus()
 													#it.grab_click_focus()
 													#it.button_pressed = true
