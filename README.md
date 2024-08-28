@@ -1,8 +1,8 @@
 # Godot Global Project
-A complete solution to making true Global Plugins for the Godot Game Engine. 
+A complete solution to making true global plugins for the Godot Game Engine. 
 
 ## Installation
-This is not an addon, but a project for you to keep on your system. All you need to do is open this project in godot, and a script will be injected into EditorSettings. From there:
+This is not an addon, but a project for you to keep on your computer. All you need to do is open this project in godot, and a script will be injected into EditorSettings. From there:
 
 - Your `editor-only` plugins are global, running in the Editor every time you open a project.
 - Your `addons` will be imported & enabled when projects load, depending on what color you assign their folders.
@@ -11,6 +11,19 @@ This is not an addon, but a project for you to keep on your system. All you need
 ## Folder Overview
 #### `editor-only`
 - In this folder you store scripts that extend `EditorPlugin`. They will be loaded, instantiated, and ran in the editor every time. But they will not be available to projects, only the editor.
+- They work mostly the same as normal EditorPllugins, but they have a few limitations.
+- These plugins are not copied into any project, rather they are loaded directly from the global-project folder. They're not actually plugins, like the ones you enable in ProjectSettings, so they don't have access to:
+	- `EditorPlugin` virtual methods
+ 	- `EditorPlugin` signals
+- The biggest limitation, however, is with dependencies.
+	- When loading resources, the `res://` path cannot point to any files in the global-project, they can only point to files in folders of the running project.
+	- Only absolute paths can be used to load global-project files. But the editor makes that very hard to do.
+ 	- So instead, I included a plugin that automatically changes `res://` paths to absolute paths for ***preloads only***.
+  	- If you want to access the absolute path directly, you can access a `paths.gd` script like so
+  	  ```gdscript
+  	  var Paths := preload("D:/Godot/global-project//editor-only/included/paths.gd")
+  	  var my_path := Paths.global + "/my_path"
+  	  ```
 #### `addons`  
 - Store normal addons in here, even ones from the AssetLib. There are various options for how these addons should be (automatically) imported, depending on folder colors.
 - Set the folder color by `right click > Set Folder Color...`
