@@ -20,7 +20,7 @@ These plugins are not copied into any project, rather they are loaded directly f
 
 The biggest limitation, however, is with dependencies.
 - When loading resources, `res://` paths can only point to files of the current project's directory, not files in the global-project. Only absolute paths can be used to load global-project files. But the editor makes that very hard to do.
-- So instead, I included a plugin that automatically changes `res://` paths to absolute paths for ***preloads***.
+- So instead, I included a plugin that automatically changes `res://` paths to absolute paths for ***script preloads***.
 	```gdscript
 	# This
 	var my_res_file := preload("res://editor-only/my-plugin/my-file.gd")
@@ -49,6 +49,13 @@ The biggest limitation, however, is with dependencies.
 
 > [!TIP]
 > The entire addon import functionality (next section) is implemented as an `editor-only` plugin in `/editor-only/included/addon-importer.gd`. You can view that code as an example.
+
+[!IMPORTANT]
+> Currently only script paths are modified. Other resources seem a lot more complicated, so I'll have to tackle them at a later date.
+> 
+> For now, any resource can be loaded if they ere simple. But if they themselves have dependencies, they may fail to load. Somewhat of a solution is to make every sub-resource unique, which will embed them. But that inflates file sizes, and it doesn't let them be shared.
+>
+> Another solution is to not use the editor and attatch resources by code. This can be fine until you need to load scenes. 
 
 ### `addons`  
 Store normal addons in here, even ones from the AssetLib. There are various options for how these addons should be (automatically) imported, depending on folder colors. 
