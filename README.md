@@ -45,10 +45,10 @@ The biggest limitation, however, is with dependencies.
 > For example many of my paths might look like `D:/Godot/global-project//`
 
 > [!WARNING]
-> Also `class_name` does not work, since these files are not in the current directory. Use preloads instead, which similar intellisense. The only difference is they cannot be used as types directly.
+> Also `class_name` does not work, since these files are not in the current directory. Use preloads instead, which have similar intellisense. The only difference is they cannot be used as types directly.
 
 > [!TIP]
-> The entire addon import functionality (next section) is implemented as an `editor-only` plugin in `/editor-only/included/addon-importer.gd`. You can browse that code as an example.
+> The entire addon import functionality (next section) is implemented as an `editor-only` plugin in `/editor-only/included/addon-importer.gd`. You can view that code as an example.
 
 ### `addons`  
 Store normal addons in here, even ones from the AssetLib. There are various options for how these addons should be (automatically) imported, depending on folder colors. 
