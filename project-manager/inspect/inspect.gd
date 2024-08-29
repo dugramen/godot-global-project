@@ -150,7 +150,8 @@ func _enter_tree() -> void:
 														item.queue_redraw()
 													,
 												icon = get_theme_icon(item.get_class(), "EditorIcons")
-											},  func(it: Button):
+											},  
+											func(it: Button):
 												if item.get_meta("just_grabbed_focus", false):
 													it.grab_focus()
 													it.set_pressed_no_signal(true)
@@ -162,8 +163,10 @@ func _enter_tree() -> void:
 													scroll_container.scroll_vertical = offset.y - scroll_container.size.y / 2.0
 													scroll_container.scroll_horizontal = offset.x + it.size.x
 													prints("focused pos ", it.global_position, '-', scroll, offset)
-													#it.grab_click_focus()
-													#it.button_pressed = true
+												elif item.has_meta("just_lost_focus"):
+													it.release_focus()
+													it.set_pressed_no_signal(false)
+													it.remove_meta("just_lost_focus")
 												,
 											],
 											[GridContainer, {
@@ -252,6 +255,7 @@ func connect_node(node: Node):
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed:
+		var old_inspected = inspected_node
 		inspected_node = topmost_node
 		if inspected_node:
 			var nodes: Array[Node] = [inspected_node.get_parent()]
@@ -263,6 +267,8 @@ func _gui_input(event: InputEvent) -> void:
 				nodes.push_back(node.get_parent())
 			popup.grab_focus()
 			inspected_node.set_meta("just_grabbed_focus", true)
+			if old_inspected is Node:
+				old_inspected.set_meta("just_lost_focus",  true)
 			inspecting = false
 			gdx.render()
 	elif event is InputEventMouseMotion:
