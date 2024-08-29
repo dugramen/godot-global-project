@@ -1,6 +1,6 @@
 extends Control
 
-var gdx := preload("D:/Godot/global-project//editor-only/included/gdx.gd").new()
+var gdx := preload("C:/godot/global-project//editor-only/included/gdx.gd").new()
 
 var topmost_node: Control
 var hovered_nodes := {}
@@ -152,14 +152,18 @@ func _enter_tree() -> void:
 												icon = get_theme_icon(item.get_class(), "EditorIcons")
 											},  func(it: Button):
 												if item.get_meta("just_grabbed_focus", false):
-													var offset := it.global_position - scroll_container.global_position
-													scroll_container.scroll_vertical = offset.y
-													prints("focused pos ", it, offset)
 													it.grab_focus()
-													#it.grab_click_focus()
-													#it.button_pressed = true
 													it.set_pressed_no_signal(true)
 													item.remove_meta("just_grabbed_focus")
+													await get_tree().process_frame
+													var offset := it.global_position - scroll_container.global_position
+													var scroll := Vector2(scroll_container.scroll_horizontal, scroll_container.scroll_vertical)
+													offset += scroll
+													scroll_container.scroll_vertical = offset.y - scroll_container.size.y / 2.0
+													scroll_container.scroll_horizontal = offset.x + it.size.x
+													prints("focused pos ", it.global_position, '-', scroll, offset)
+													#it.grab_click_focus()
+													#it.button_pressed = true
 												,
 											],
 											[GridContainer, {
@@ -250,7 +254,7 @@ func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed:
 		inspected_node = topmost_node
 		if inspected_node:
-			var nodes: Array[Node] = [inspected_node]
+			var nodes: Array[Node] = [inspected_node.get_parent()]
 			while !nodes.is_empty():
 				var node := nodes.pop_back() as Node
 				node.set_meta("expanded", true)
