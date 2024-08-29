@@ -9,24 +9,50 @@ This is not an addon, but a project for you to keep on your computer. All you ne
 - Your `project-manager` plugins will run alongside the project manager.
 
 ## Folder Overview
-#### `editor-only`
-- In this folder you store scripts that extend `EditorPlugin`. They will be loaded, instantiated, and ran in the editor every time. But they will not be available to projects, only the editor.
-- They work mostly the same as normal EditorPllugins, but they have a few limitations.
-- These plugins are not copied into any project, rather they are loaded directly from the global-project folder. They're not actually plugins, like the ones you enable in ProjectSettings, so they don't have access to:
-	- `EditorPlugin` virtual methods
- 	- `EditorPlugin` signals
-- The biggest limitation, however, is with dependencies.
-	- When loading resources, the `res://` path cannot point to any files in the global-project, they can only point to files in folders of the running project.
-	- Only absolute paths can be used to load global-project files. But the editor makes that very hard to do.
- 	- So instead, I included a plugin that automatically changes `res://` paths to absolute paths for ***preloads only***.
-  	- If you want to access the absolute path directly, you can access a `paths.gd` script like so
-  	  ```gdscript
-  	  var Paths := preload("D:/Godot/global-project//editor-only/included/paths.gd")
-  	  var my_path := Paths.global + "/my_path"
-  	  ```
-#### `addons`  
-- Store normal addons in here, even ones from the AssetLib. There are various options for how these addons should be (automatically) imported, depending on folder colors.
-- Set the folder color by `right click > Set Folder Color...`
+### `editor-only`
+In this folder you store scripts that extend `EditorPlugin`. They will be loaded, instantiated, and ran in the editor every time. But they will not be available to projects, only the editor. They work mostly the same as normal EditorPllugins, but they have a few limitations.
+
+> They must have `@tool` at the top of the file.
+
+These plugins are not copied into any project, rather they are loaded directly from the global-project folder. They're not actually plugins, like the ones you enable in ProjectSettings, so they don't have access to:
+- `EditorPlugin` virtual methods
+- `EditorPlugin` signals
+
+The biggest limitation, however, is with dependencies.
+- When loading resources, `res://` paths can only point to files of the current project's directory, not files in the global-project. Only absolute paths can be used to load global-project files. But the editor makes that very hard to do.
+- So instead, I included a plugin that automatically changes `res://` paths to absolute paths for ***preloads***.
+	```gdscript
+	# This
+	var my_res_file := preload("res://editor-only/my-plugin/my-file.gd")
+	# Becomes this
+	var my_abs_file := preload("D:/Godot/global-project//editor-only/my-plugin/my-file.gd")
+	```
+- If you want to access the absolute path in a variable or something, you can access the included `paths.gd` script like so
+  ```gdscript
+  var Paths := preload("res://editor-only/included/paths.gd")
+  var my_path := Paths.global + "/my_path"
+  ```
+
+> [!NOTE]
+> Absolute paths will also be updated if the global project has been moved or renamed. The delimimiter is `//`.
+> 
+> Don't worry if your path doesn't begin with `res://`, any path will be properly converted on load & when the file is saved, as long as it has `//` between the global-project path and the rest of your path.
+>
+> When you save your script, the changed path won't be immediately visible in the script editor. But don't worry, the actual file will have the updated path.
+
+> [!WARNING]
+> If you wish to share plugins, the your global-project absolute path will probably be visible. So keep the project in a non sensitive location. <br/>
+> For example many of my paths might look like `D:/Godot/global-project//`
+
+> [!WARNING]
+> Also `class_name` does not work, since these files are not in the current directory. Use preloads instead, which similar intellisense. The only difference is they cannot be used as types directly.
+
+> [!TIP]
+> The entire addon import functionality (next section) is implemented as an `editor-only` plugin in `/editor-only/included/addon-importer.gd`. You can browse that code as an example.
+
+### `addons`  
+Store normal addons in here, even ones from the AssetLib. There are various options for how these addons should be (automatically) imported, depending on folder colors. 
+Set the folder color by `right click > Set Folder Color...`
 
 ![image](https://github.com/user-attachments/assets/5bf497ea-6b22-4b07-ba2c-92e4025471c1)
 
