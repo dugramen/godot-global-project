@@ -4,7 +4,7 @@ extends EditorPlugin
 
 static var summer := "Season"
 var gdx := preload("res://editor-only/included/gdx.gd")
-var aim := preload("res://editor-only/included/addon_importer.gd")
+var aim := preload("res://editor-only/included/addon_import_plugin.gd")
 var otherx := preload("res://editor-only/included/gdx.gd") 
 var vine := preload("res://editor-only/included/gdx.gd")
 var Paths := preload("res://editor-only/included/paths.gd")

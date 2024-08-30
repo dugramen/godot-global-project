@@ -41,7 +41,7 @@ static func init_extensions(loader_path: String, this_file: GDScript) -> void:
 					for file_name in DirAccess.get_files_at(global_path.path_join(path)):
 						var file_path := global_path.path_join(path).path_join(file_name)
 						print(file_path)
-						if file_name.ends_with(".gd"):
+						if file_name.ends_with("plugin.gd"):
 							var file = load(file_path)
 							if file is GDScript:
 								instantiate_plugin(file)
@@ -56,7 +56,7 @@ static func init_extensions(loader_path: String, this_file: GDScript) -> void:
 						paths.push_back(path.path_join(dir_name))
 					for file_name in DirAccess.get_files_at(path):
 						var file_path := path.path_join(file_name)
-						if file_name.ends_with(".gd"):
+						if file_name.ends_with("plugin.gd"):
 							var file = load(file_path)
 							if file is GDScript:
 								var instance: Object = file.new()

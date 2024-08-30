@@ -11,7 +11,7 @@ func delete_directory(path: String):
 	for file_name in DirAccess.get_files_at(path):
 		DirAccess.remove_absolute(path.path_join(file_name))
 	
-	DirAccess.remove_absolute(path)
+	DirAccess.remove_absolute(path) 
 
 func import_by_colors():
 	#var folder_colors: Dictionary = ProjectSettings.get_setting("file_customization/folder_colors", {})
