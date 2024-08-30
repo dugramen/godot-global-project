@@ -238,19 +238,21 @@ func _enter_tree() -> void:
 												columns = 2,
 												size_flags_horizontal = Control.SIZE_EXPAND_FILL,
 												size_flags_vertical = Control.SIZE_EXPAND_FILL,
-											}, [
+											}, func(it: Container): it.queue_sort(), [
 												gdx.map_i(value,
 													func(prop): return ([
 														[Button, {
 															text = prop.name,
-															clip_text = true,
+															#clip_text = true,
 															alignment = HORIZONTAL_ALIGNMENT_LEFT,
+															autowrap_mode = TextServer.AUTOWRAP_ARBITRARY,
 															size_flags_horizontal = Control.SIZE_EXPAND_FILL,
 															size_flags_vertical = Control.SIZE_EXPAND_FILL,
 														}],
 														[Label, {
 															text = inspected_node.get(prop.name),
-															clip_text = true,
+															#clip_text = true,
+															autowrap_mode = TextServer.AUTOWRAP_ARBITRARY,
 															size_flags_horizontal = Control.SIZE_EXPAND_FILL,
 															size_flags_vertical = Control.SIZE_EXPAND_FILL,
 														}]
@@ -306,7 +308,7 @@ func _enter_tree() -> void:
 	#popup.popup_centered(Vector2(500, 400))
 
 func connect_node(node: Node):
-	if node is Control and node != self and node != popup and node.get_window().has_focus():
+	if node is Control and node != self and node != popup and !is_ancestor_of(node):
 		all_controls[node] = true
 		node.draw.connect(node_draw.bind(node))
 		node.tree_exiting.connect(disconnect_node.bind(node))
@@ -343,7 +345,9 @@ func _gui_input(event: InputEvent) -> void:
 			if !node.is_visible_in_tree(): 
 				hovered_nodes.erase(node)
 				continue
-			
+			if !node.get_window().has_focus():
+				hovered_nodes.erase(node)
+				continue
 			
 			pass
 			
