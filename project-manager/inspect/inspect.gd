@@ -35,9 +35,10 @@ var inspect_button := Button.new()
 var inspecting := false:
 	set(v):
 		if v:
-			if !popup.visible:
-				popup.popup_centered(Vector2(500, 400))
+			#if !popup.visible:
+				#popup.popup_centered(Vector2(500, 400))
 			mouse_filter = MouseFilter.MOUSE_FILTER_STOP
+			get_window().grab_focus()
 		else:
 			mouse_filter = MouseFilter.MOUSE_FILTER_IGNORE
 			topmost_node.queue_redraw()
@@ -60,7 +61,7 @@ func _enter_tree() -> void:
 	get_tree().node_added.connect(connect_node)
 	
 	mouse_filter = MouseFilter.MOUSE_FILTER_IGNORE
-	inspect_button.icon = get_theme_icon("ColorPick", "EditorIcons")
+	inspect_button.icon = get_theme_icon("FileTree", "EditorIcons")
 	inspect_button.text = "Inspect"
 	var button_parent: Node = root.get_child(0, true).get_child(1, true).get_child(0, true).get_child(0, true).get_child(2, true)
 	print(button_parent)
@@ -68,7 +69,8 @@ func _enter_tree() -> void:
 	button_parent.move_child(inspect_button, 0)
 	inspect_button.pressed.connect(
 		func():
-			inspecting = true
+			popup.popup_centered(Vector2(600, 400))
+			#inspecting = true
 	)
 	
 	var scroll_container := ScrollContainer.new()
@@ -89,10 +91,18 @@ func _enter_tree() -> void:
 					size_flags_vertical = Control.SIZE_EXPAND_FILL
 					#collapsed = inspected_node == null,
 				}, [
+					# Left Half
 					[VBoxContainer, {
 						size_flags_horizontal = Control.SIZE_EXPAND_FILL,
 						size_flags_vertical = Control.SIZE_EXPAND_FILL
 					}, [
+						[Button, {
+							text = "Pick from UI",
+							icon = get_theme_icon("ColorPick", "EditorIcons"),
+							size_flags_horizontal = SIZE_SHRINK_BEGIN,
+							on_pressed = func():
+								inspecting = true,
+						}],
 						[scroll_container, {
 							#"custom_minimum_size" = Vector2(100, 200),
 							#follow_focus = true,
@@ -204,6 +214,8 @@ func _enter_tree() -> void:
 							]]
 						]],
 					]],
+					
+					# Right Half
 					[VBoxContainer, {
 						size_flags_horizontal = Control.SIZE_EXPAND_FILL,
 						size_flags_vertical = Control.SIZE_EXPAND_FILL,
