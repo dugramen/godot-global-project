@@ -97,7 +97,6 @@ func process_extension(file: GDScript, global_path := ProjectSettings.globalize_
 	new_file.source_code = new_source_code 
 	if file_path.begins_with("res://"):
 		var new_path := global_path.path_join(".processed").path_join(file_path.trim_prefix("res://"))
-		prints(new_path)  
 		DirAccess.make_dir_recursive_absolute(new_path.get_base_dir())
 		ResourceSaver.save(new_file, new_path)
 	#prints(file, file.resource_path)

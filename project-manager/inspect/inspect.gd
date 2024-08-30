@@ -1,6 +1,6 @@
 extends Control
 
-var gdx := preload("C:/godot/global-project//editor-only/included/gdx.gd").new()
+var gdx := preload("res://editor-only/included/gdx.gd").new()
 
 var topmost_node: Control
 var hovered_nodes := {}
