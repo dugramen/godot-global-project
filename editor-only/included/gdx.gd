@@ -181,3 +181,14 @@ static func map_i(arr: Array, callable: Callable):
 		var args := [arr[i], i, arr, callable]
 		result.append(callable.callv(args.slice(0, callable.get_argument_count())))
 	return result
+
+static func map_key(dict: Dictionary, callable: Callable):
+	var result := []
+	var i := -1
+	for key in dict:
+		i += 1
+		var args := [key, dict[key], i, dict, callable]
+		result.append(callable.callv(args.slice(0, callable.get_argument_count())))
+	return result
+	
+	

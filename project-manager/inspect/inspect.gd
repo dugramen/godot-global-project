@@ -6,7 +6,29 @@ var topmost_node: Control
 var hovered_nodes := {}
 var all_controls := {}
 
-var inspected_node: Node
+var grouped_props := {}
+var inspected_node: Node:
+	set(v):
+		inspected_node = v
+		grouped_props.clear()
+		var scripts := [v.get_script()]
+		while !scripts.is_empty():
+			var scr = scripts.pop_back()
+			if scr is Script:
+				scripts.push_back(scr.get_base_script())
+				var sname := scr.get_global_name() as StringName
+				if sname.is_empty():
+					sname = scr.resource_path()
+				grouped_props[sname] = scr.get_script_property_list()
+			break
+		var classes := [v.get_class()]
+		while !classes.is_empty():
+			var c = classes.pop_back() as String
+			classes.push_back(ClassDB.get_parent_class(c))
+			grouped_props[c] = ClassDB.class_get_property_list(c, true)
+			if c == "Object":
+				break
+		
 var popup := PopupPanel.new() 
 
 var inspect_button := Button.new()
@@ -168,6 +190,7 @@ func _enter_tree() -> void:
 													it.release_focus()
 													it.set_pressed_no_signal(false)
 													it.remove_meta("just_lost_focus")
+													get_script()
 												,
 											],
 											[GridContainer, {
@@ -184,7 +207,7 @@ func _enter_tree() -> void:
 					[VBoxContainer, {
 						size_flags_horizontal = Control.SIZE_EXPAND_FILL,
 						size_flags_vertical = Control.SIZE_EXPAND_FILL,
-						size_flags_stretch_ratio = .65,
+						#size_flags_stretch_ratio = .65,
 					}, [
 						[
 							[Label, {
@@ -201,31 +224,67 @@ func _enter_tree() -> void:
 								size_flags_vertical = Control.SIZE_EXPAND_FILL,
 								size_flags_horizontal = Control.SIZE_EXPAND_FILL,
 							}, [
-								[GridContainer, {
-									columns = 2,
+								[VBoxContainer, {
 									size_flags_horizontal = Control.SIZE_EXPAND_FILL,
-									size_flags_vertical = Control.SIZE_EXPAND_FILL
+									size_flags_vertical = Control.SIZE_EXPAND_FILL,
 								}, [
-									gdx.map_i(
-										inspected_node.get_property_list(),
-										func(prop, index, array, callable): return (
-											[
-												[Button, {
-													text = prop.name,
-													size_flags_horizontal = Control.SIZE_EXPAND_FILL,
-													size_flags_vertical = Control.SIZE_EXPAND_FILL,
-													alignment = HORIZONTAL_ALIGNMENT_LEFT,
-													clip_text = true,
-												}],
-												[Label, {
-													text = str(inspected_node.get_indexed(prop.name)),
-													size_flags_horizontal = Control.SIZE_EXPAND_FILL,
-													clip_text = true,
-												}]
-											]
-										),
+									gdx.map_key(
+										grouped_props,
+										func(key, value, i): return ([
+											[Button, {
+												text = key
+											}],
+											[GridContainer, {
+												columns = 2,
+												size_flags_horizontal = Control.SIZE_EXPAND_FILL,
+												size_flags_vertical = Control.SIZE_EXPAND_FILL,
+											}, [
+												gdx.map_i(value,
+													func(prop): return ([
+														[Button, {
+															text = prop.name,
+															clip_text = true,
+															alignment = HORIZONTAL_ALIGNMENT_LEFT,
+															size_flags_horizontal = Control.SIZE_EXPAND_FILL,
+															size_flags_vertical = Control.SIZE_EXPAND_FILL,
+														}],
+														[Label, {
+															text = inspected_node.get(prop.name),
+															clip_text = true,
+															size_flags_horizontal = Control.SIZE_EXPAND_FILL,
+															size_flags_vertical = Control.SIZE_EXPAND_FILL,
+														}]
+													])
+												)
+											]]
+										]),
 									)
-								]]
+								]],
+								#[GridContainer, {
+									#columns = 2,
+									#size_flags_horizontal = Control.SIZE_EXPAND_FILL,
+									#size_flags_vertical = Control.SIZE_EXPAND_FILL
+								#}, [
+									#gdx.map_i(
+										#inspected_node.get_property_list(),
+										#func(prop, index, array, callable): return (
+											#[
+												#[Button, {
+													#text = prop.name,
+													#size_flags_horizontal = Control.SIZE_EXPAND_FILL,
+													#size_flags_vertical = Control.SIZE_EXPAND_FILL,
+													#alignment = HORIZONTAL_ALIGNMENT_LEFT,
+													#clip_text = true,
+												#}],
+												#[Label, {
+													#text = str(inspected_node.get_indexed(prop.name)),
+													#size_flags_horizontal = Control.SIZE_EXPAND_FILL,
+													#clip_text = true,
+												#}]
+											#]
+										#),
+									#)
+								#]]
 							]]
 						],
 					]] if inspected_node else [],
