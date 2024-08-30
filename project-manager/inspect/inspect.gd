@@ -35,6 +35,7 @@ func _enter_tree() -> void:
 		var node: Node = nodes.pop_back()
 		nodes.append_array(node.get_children(true))
 		connect_node(node)
+	get_tree().node_added.connect(connect_node)
 	
 	mouse_filter = MouseFilter.MOUSE_FILTER_IGNORE
 	inspect_button.icon = get_theme_icon("ColorPick", "EditorIcons")
@@ -49,8 +50,6 @@ func _enter_tree() -> void:
 	)
 	
 	var scroll_container := ScrollContainer.new()
-	
-	get_tree().node_added.connect(connect_node)
 	var button_group := ButtonGroup.new()
 	button_group.allow_unpress = true
 	gdx.render(func(): return ([
@@ -246,12 +245,16 @@ func _enter_tree() -> void:
 	#popup.popup_centered(Vector2(500, 400))
 
 func connect_node(node: Node):
-	if node is Control and node != self and node != popup and node.get_window() == get_tree().root:
+	if node is Control and node != self and node != popup and node.get_window().has_focus():
 		all_controls[node] = true
 		node.draw.connect(node_draw.bind(node))
+		node.tree_exiting.connect(disconnect_node.bind(node))
 		#node.mouse_entered.connect(node_mouse_entered.bind(node))
 		#node.mouse_exited.connect(node_mouse_exited.bind(node))
 		#node.gui_input.connect(node_gui_input.bind(node))
+
+func disconnect_node(node: Node):
+	all_controls.erase(node)
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed:
