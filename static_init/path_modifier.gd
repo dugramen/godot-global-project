@@ -23,6 +23,7 @@ static func _static_init() -> void:
 
 func process_all_extensions() -> void:
 	print("processing all extensions")
+	delete_processed_folder() 
 	var paths := ["res://editor-only", "res://project-manager"]
 	var global_path := ProjectSettings.globalize_path("res://")
 	while paths.size() > 0:
@@ -36,6 +37,16 @@ func process_all_extensions() -> void:
 			if file is GDScript:
 				process_extension(file, global_path)
 		#print(path) 
+
+func delete_processed_folder(path := ProjectSettings.globalize_path("res://").path_join(".processed")):
+	#print("deleting all folders ", DirAccess.dir_exists_absolute(path))
+	if DirAccess.dir_exists_absolute(path):
+		print(path) 
+		for file_name in DirAccess.get_files_at(path):
+			DirAccess.remove_absolute(path.path_join(file_name))
+		for dir_name in DirAccess.get_directories_at(path):
+			delete_processed_folder(path.path_join(dir_name))
+		DirAccess.remove_absolute(path)
 
 #func _enable_plugin() -> void:
 	#print("_enable_plugin")
