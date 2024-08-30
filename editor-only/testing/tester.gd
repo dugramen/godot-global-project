@@ -16,6 +16,7 @@ var Paths := preload("C:/godot/global-project//editor-only/included/paths.gd")
 
 func _init() -> void:
 	prints("paths - ", Paths.global, Paths.local)
+	print("we processed now")
 	#var gdx = load("res://extensions/addon_importer/gdx.gd")
 	#print(gdx)
 	#print(gdx.hello)

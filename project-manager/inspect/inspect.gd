@@ -45,7 +45,7 @@ var inspecting := false:
 		inspecting = v
 
 func _enter_tree() -> void:
-	print("I was spawned")
+	print("I was spawned")  
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	#mouse_filter = MOUSE_FILTER_PASS
 	

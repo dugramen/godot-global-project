@@ -32,13 +32,15 @@ static func init_extensions(loader_path: String, this_file: GDScript) -> void:
 				if global_path == local_path: return
 				
 				var scripts: Array[Script] = []
-				var paths := ["editor-only"]
+				var paths := [".processed/editor-only"]
 				while !paths.is_empty():
 					var path: String = paths.pop_back()
+					#print(path)
 					for dir_name in DirAccess.get_directories_at(global_path.path_join(path)):
 						paths.push_back(path.path_join(dir_name))
 					for file_name in DirAccess.get_files_at(global_path.path_join(path)):
 						var file_path := global_path.path_join(path).path_join(file_name)
+						print(file_path)
 						if file_name.ends_with(".gd"):
 							var file = load(file_path)
 							if file is GDScript:
@@ -47,7 +49,7 @@ static func init_extensions(loader_path: String, this_file: GDScript) -> void:
 				print("project manager?")
 				var root: Node = main_loop.root
 				global_path = loader_path.trim_suffix("loader.gd")
-				var paths := [global_path.path_join("project-manager")]
+				var paths := [global_path.path_join(".processed/project-manager")]
 				while !paths.is_empty():
 					var path: String = paths.pop_back() as String
 					for dir_name in DirAccess.get_directories_at(path):
