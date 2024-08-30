@@ -104,7 +104,9 @@ func _enter_tree() -> void:
 											}],
 											[Label, {
 												text = (
-													"v" if item.get_meta("expanded", false) else ">"
+													"" if item.get_child_count(true) == 0 else 
+													"v" if item.get_meta("expanded", false) else 
+													">"
 												),
 												mouse_filter = MOUSE_FILTER_IGNORE,
 												size_flags_vertical = SIZE_SHRINK_BEGIN,
