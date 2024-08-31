@@ -12,7 +12,7 @@ This is not an addon, but a project for you to keep on your computer. All you ne
 ### `editor-only`
 In this folder you store scripts that extend `EditorPlugin`. They will be loaded, instantiated, and ran in the editor every time. But they will not be available to projects, only the editor. They work mostly the same as normal EditorPllugins, but they have a few limitations.
 
-> They must have `@tool` at the top of the file.
+> As always, EditorPlugins should have `@tool` at the top of the file.
 
 These plugins are not copied into any project, rather they are loaded directly from the global-project folder. They're not actually plugins, like the ones you enable in ProjectSettings, so they don't have access to:
 - `EditorPlugin` virtual methods
