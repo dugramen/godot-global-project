@@ -1,0 +1,38 @@
+[gd_scene load_steps=2 format=3 uid="uid://bbr6u2kefuco4"]
+
+[sub_resource type="GDScript" id="GDScript_l8f1h"]
+script/source = "extends Control
+
+#var farm := preload(\"res://editor-only/testing/farm.tscn\")
+
+func _ready() -> void:
+	#print(ResourceLoader.get_dependencies(\"res://node.tscn\"))
+	#var deps := ResourceLoader.get_dependencies(\"res://editor-only/testing/farm.tscn\")
+	var content := FileAccess.get_file_as_string(\"res://editor-only/testing/farm.tscn\")
+	#content = content.replace(\"ExtResource\", 'extres')
+	var process_path := ProjectSettings.globalize_path(\"res://.processed\")
+	
+	var i := 0
+	while i >= 0:
+		i = content.find(\"\\n[ext_resource \", i + 1)
+		if i < 0: break
+		
+		var path_substr := ' path=\"'
+		var path_start := content.find(path_substr, i) + path_substr.length()
+		var path_end := content.find('\"', path_start)
+		
+		var end = content.find(\"]\\n\", i + 1)
+		var slice := content.substr(path_start, path_end - path_start)
+		if slice.begins_with(\"res://\"):
+			slice = slice.trim_prefix(\"res://\")
+			slice = process_path.path_join(slice)
+		content = content.erase(path_start, path_end - path_start)
+		content = content.insert(path_start, slice)
+		i = path_start + slice.length()
+	print(content)
+"
+
+[node name="Node" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = SubResource("GDScript_l8f1h")

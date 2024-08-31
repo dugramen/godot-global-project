@@ -11,20 +11,13 @@ config_version=5
 [application]
 
 config/name="global-project"
-run/main_scene="res://node.tscn"
+run/main_scene="res://_internal/testing/node.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://static_init/folder_color.cfg", "res://static_init/path_modifier.cfg")
-
-[file_customization]
-
-folder_colors={
-"res://addons/dialogue_manager/": "orange",
-"res://addons/script-dock/": "red"
-}
+enabled=PackedStringArray("res://_internal/folder_colors/plugin.cfg", "res://_internal/injector/plugin.cfg", "res://_internal/path_processor/plugin.cfg")
 
 [rendering]
 

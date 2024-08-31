@@ -1,12 +1,6 @@
 @tool
 extends EditorPlugin
 
-static func _static_init() -> void:
-	var path := "res://static_init/folder_color.cfg"
-	if EditorInterface.is_plugin_enabled(path):
-		EditorInterface.set_plugin_enabled(path, false)
-	EditorInterface.set_plugin_enabled(path, true)
-
 var menu: PopupMenu
 
 func _enter_tree() -> void:

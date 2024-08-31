@@ -4,10 +4,11 @@ extends EditorPlugin
 
 static var summer := "Season"
 var gdx := preload("res://editor-only/included/gdx.gd")
-var aim := preload("res://editor-only/included/addon_import_plugin.gd")
+var aim := preload("res://editor-only/included/addon_import_plugin.gd") 
 var otherx := preload("res://editor-only/included/gdx.gd") 
 var vine := preload("res://editor-only/included/gdx.gd")
 var Paths := preload("res://editor-only/included/paths.gd")
+var farm := preload("res://editor-only/testing/farm.tscn")
 
 # Tell me about it 
  
@@ -16,7 +17,7 @@ var Paths := preload("res://editor-only/included/paths.gd")
 
 func _init() -> void:
 	prints("paths - ", Paths.global, Paths.local)
-	print("we processed now")
+	print("we processed now") 
 	#var gdx = load("res://extensions/addon_importer/gdx.gd")
 	#print(gdx)
 	#print(gdx.hello)

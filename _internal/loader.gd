@@ -8,8 +8,9 @@ static var editor_plugin_holder: Node = null
 
 static func init_extensions(loader_path: String, this_file: GDScript) -> void: 
 	#load(loader_path).take_over_path("res://loader.gd")
-	print('running loader')
 	#return
+	global_path = loader_path.trim_suffix("_internal/loader.gd")
+	print('running loader ', global_path)
 	var main_loop := Engine.get_main_loop()
 	if main_loop is SceneTree:
 		main_loop.process_frame.connect(func():
@@ -26,7 +27,6 @@ static func init_extensions(loader_path: String, this_file: GDScript) -> void:
 					base_control.add_child(editor_plugin_holder)
 					editor_plugin_holder.name = holder_name
 				
-				global_path = loader_path.trim_suffix("loader.gd")
 				local_path = ProjectSettings.globalize_path("res://")
 				
 				if global_path == local_path: return
@@ -48,7 +48,6 @@ static func init_extensions(loader_path: String, this_file: GDScript) -> void:
 			else:
 				print("project manager?")
 				var root: Node = main_loop.root
-				global_path = loader_path.trim_suffix("loader.gd")
 				var paths := [global_path.path_join(".processed/project-manager")]
 				while !paths.is_empty():
 					var path: String = paths.pop_back() as String
