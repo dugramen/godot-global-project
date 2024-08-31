@@ -1,5 +1,5 @@
 # Godot Global Project
-A complete solution to making true global plugins for the Godot Game Engine. 
+A framework for making true global plugins for the Godot Game Engine. 
 
 ## Installation
 This is not an addon, but a project for you to keep on your computer. All you need to do is open this project in godot, and a script will be injected into EditorSettings. From there:
