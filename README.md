@@ -20,40 +20,35 @@ These plugins are not copied into any project, rather they are loaded directly f
 
 The biggest limitation, however, is with dependencies.
 - When loading resources, `res://` paths can only point to the current project's directory. To load global-project files, they must use absolute paths. But the editor makes that very hard to do.
-- So instead, I included a plugin that automatically changes `res://` paths to absolute paths for ***script preloads***.
+- So instead of loading scripts directly, they are processed into separate scripts, with all their ***preload paths*** converted to paths in the global-project. 
 	```gdscript
 	# This
 	var my_res_file := preload("res://editor-only/my-plugin/my-file.gd")
-	# Becomes this
+	# Becomes something like this
 	var my_abs_file := preload("D:/Godot/global-project//editor-only/my-plugin/my-file.gd")
 	```
-- If you want to access the absolute path in a variable or something, you can access the included `paths.gd` script like so
+> All processed files are stored in the `.processed` folder of the project (ignored by the editor)
+- If you want direct access to the global-project path in a variable or something, you can preload the included `paths.gd` script like so
   ```gdscript
   var Paths := preload("res://editor-only/included/paths.gd")
+  
+  # Paths.global is the global-project path
   var my_path := Paths.global + "/my_path"
+  
+  # Paths.processed is where the processed files are stored
+  var my_processed_path := Paths.processed + "/my_path"
   ```
 
-> [!NOTE]
-> Absolute paths will also be updated if the global project has been moved or renamed. The delimimiter is `//`.
-> 
-> Don't worry if your path doesn't begin with `res://`, any path will be properly converted on load & when the file is saved, as long as it has `//` between the global-project path and the rest of your path.
->
-> When you save your script, the changed path won't be immediately visible in the script editor. But don't worry, the actual file will have the updated path.
-
 > [!WARNING]
-> If you wish to share plugins, the your global-project absolute path will probably be visible. So keep the project in a non sensitive location. <br/>
-> For example many of my paths might look like `D:/Godot/global-project//`
-
-> [!WARNING]
-> Also `class_name` does not work, since these files are not in the current directory. Use preloads instead, which have similar intellisense. The only difference is they cannot be used as types directly.
+> `class_name` does not work as expected, since these files are not stored in the current directory. Use preloads instead, which have similar intellisense. The only difference is they cannot be used as types directly.
 
 > [!TIP]
 > The entire addon import functionality (next section) is implemented as an `editor-only` plugin in `/editor-only/included/addon-importer.gd`. You can view that code as an example.
 
-[!IMPORTANT]
-> Currently only script paths are modified. Other resources seem a lot more complicated, so I'll have to tackle them at a later date.
+> [!IMPORTANT]
+> Currently only script paths are modified. Other resources might be more complicated, so I'll have to tackle them at a later date.
 > 
-> For now, any resource can be loaded if they ere simple. But if they themselves have dependencies, they may fail to load. Somewhat of a solution is to make every sub-resource unique, which will embed them. But that inflates file sizes, and it doesn't let them be shared.
+> For now, any resource can be loaded if they are simple. But if they themselves have dependencies, they might fail to load. Somewhat of a solution is to make every sub-resource unique, which will embed them. But doesn't let them be shared.
 >
 > Another solution is to not use the editor and attatch resources by code. This can be fine until you need to load scenes. 
 
