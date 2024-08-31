@@ -8,7 +8,7 @@ This is not an addon, but a project for you to keep on your computer. All you ne
 - Your `addons` will be imported & enabled when projects load, depending on what color you assign their folders.
 - Your `project-manager` plugins will run alongside the project manager.
 
-## Folder Overview
+## Overview
 ### `editor-only`
 In this folder you store scripts that extend `EditorPlugin`. They will be loaded, instantiated, and ran in the editor every time. But they will not be available to projects, only the editor. They work mostly the same as normal EditorPllugins, but they have a few limitations.
 
