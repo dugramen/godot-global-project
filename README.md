@@ -19,7 +19,7 @@ These plugins are not copied into any project, rather they are loaded directly f
 - `EditorPlugin` signals
 
 The biggest limitation, however, is with dependencies.
-- When loading resources, `res://` paths can only point to files of the current project's directory, not files in the global-project. Only absolute paths can be used to load global-project files. But the editor makes that very hard to do.
+- When loading resources, `res://` paths can only point to files in the current project's directory. To load global-project files, they must be converted to absolute paths. But the editor makes that very hard to do.
 - So instead, I included a plugin that automatically changes `res://` paths to absolute paths for ***script preloads***.
 	```gdscript
 	# This
