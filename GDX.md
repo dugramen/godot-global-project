@@ -1,6 +1,8 @@
 
 # GDX
-This is the UI framework. This exists specifically because extensions can't load most PackedScenes, due to subresource paths. So most of the time UI will need to be done in code. This is a lightweight framework to make that a lot easier to do. It works similar to ReactJS (gdx is a reference to jsx files)
+This is the UI framework. This exists specifically because for most of development, you couldn't load PackedScenes due to subresource paths. So the UI had to be done in code. It's not needed anymore, but its still a nice way to use UI and is what the addon_importer and tree_inspector use.
+
+This is a lightweight framework to make UI in code a lot easier to do. It works similar to ReactJS (gdx is a reference to jsx files)
 
 ## Render
 Preload the `res://editor-only/included/gdx.gd` class and instantiate it. This gives you access to a `gdx.render()` function.
