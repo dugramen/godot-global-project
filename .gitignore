@@ -4,4 +4,4 @@
 android/
 addons/*
 !.gitkeep
-extensions/testing
+editor_only/testing
