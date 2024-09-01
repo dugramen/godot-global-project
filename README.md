@@ -42,6 +42,9 @@ Another concern, is with dependencies.
 
 > [!TIP]
 > The entire addon import functionality (next section) is implemented as an `editor-only` plugin in `/editor-only/included/addon-importer-plugin.gd`. You can view that code as an example.
+>
+> You'll notice that it uses a code based UI framework, [GDX](GDX.md). I made it because for most of the development, PackedScenes, and any resource with external resources, could not be loaded.
+> It's still included for convenience, and is how the included plugins render UI. You can view the docs for it [here](GDX.md)
 
 > [!WARNING]
 > `class_name` will not work as expected, since these files are not stored in the current directory. Use preloads instead, which have similar intellisense. The only difference is they cannot be used as types directly.
@@ -77,15 +80,21 @@ Set the folder color by `right click > Set Folder Color...`
 
 - All files in `_internal` can be ignored. They handle all the globalization 
 
-# Troubleshooting
-## Editor Crash
-Since editor-only plugins load alongside the editor, if one of them is bugged, the editor may crash.
+## Troubleshooting
+Since editor-only and project-manager plugins load alongside the editor, if one of them is bugged, the editor may crash. To fix this:
+- Open the global-project's `project.godot` file directly, since global plugins are disabled for that project
+- Fix the bugged plugin or remove it altogether
+- It helps to open the console version of the editor, so you can view the debug logs
 
-Just move the bugged plugin outside of the `editor-only` folder.
+If for some reason the global-project also crashes:
+- Find `_internal/loader.gd`. This is the script that loads plugins when it itself is loaded
+- Temporarily rename or move the file, so that it doesn't get loaded
+- If you suspect that the `loader.gd` file had a bug, please report it
 
-If the editor still crashes, there may be an error in my `loader.gd` script. In that case, move or rename `loader.gd` to something else, like `_loader.gd`. And please report the issue.
+If that still doesn't work, there might be a bug in the injected EditorSettings script. This is very unlikely due to how simple it is, but just in case you'll want to remove that script. This requires you to locate the EditorSettings file.
 
-If that doesn't work, there may be an error in my `runner.gd` script, which is injected into EditorSettings. This is very unlikely due to how simple the script is, but just in case, this requires you to locate your EditorSettings file. Check [here](https://docs.godotengine.org/en/stable/tutorials/io/data_paths.html#editor-data-paths) for its location. Open the `editor_settings-4.3` (or whichever verion) file in a text editor and erase the script. It'll look something like this, just erase the whole chunk:
+Check [here](https://docs.godotengine.org/en/stable/tutorials/io/data_paths.html#editor-data-paths) for its location. Open the `editor_settings-4.3` (or whichever verion) file in a text editor and erase the script. It'll look something like this, just erase this whole chunk of text:
+
 ![image](https://github.com/user-attachments/assets/31cadeda-d22d-48d5-ad65-9b410cb96b5d)
 
-If you don't know how to open it in a text editor, or are too scared to make changes, just delete the whole `editor_settings-4.x` file, and godot will recreate it when it next loads. Again, this is very unlikely.
+If you don't know how to open it in a text editor, or are too scared to make changes, just delete the whole `editor_settings-4.x` file, and godot will recreate it when it next loads. Again, its very unlikely you'll need to do this.
