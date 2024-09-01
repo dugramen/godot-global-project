@@ -46,13 +46,6 @@ Another concern, is with dependencies.
 > [!WARNING]
 > `class_name` will not work as expected, since these files are not stored in the current directory. Use preloads instead, which have similar intellisense. The only difference is they cannot be used as types directly.
 
-> [!CAUTION]
-> Currently only script paths are modified. Other resources might be more complicated, so I'll have to tackle them at a later date.
-> 
-> For now, any resource can be loaded if they are simple. But if they themselves have dependencies, they might fail to load. Somewhat of a solution is to make every sub-resource unique, which will embed them. But doesn't let them be shared.
->
-> Another solution is to not use the editor and attatch resources by code. This can be fine until you need to load scenes. 
-
 ### `addons`  
 Store normal addons in here, even ones from the AssetLib. There are various options for how these addons should be (automatically) imported, depending on folder colors. 
 Set the folder color by `right click > Set Folder Color...`
@@ -66,7 +59,7 @@ Set the folder color by `right click > Set Folder Color...`
 | 🔴 Red | <br/> This is ideal if you're developing & testing your own addons locally. <br/> Red addons are synced exactly as they appear in the global project. <br/><br/> On load, they are deleted, and then copied over again. <br/> This means if addons are no longer Red in the global project, they will no longer exist in your other projects. <br/><br/> |
 | 🟠 Orange | <br/> This is recommended for asset store addons. <br/><br/> Only when the version in plugin.cfg has changed, the addons are deleted, then copied over. <br/> Addons that are no longer Orange will also be deleted. <br/><br/> This method makes it so files aren't copied over every time. <br/><br/> |
 | 🟡 Yellow | <br/> This is for compatability with certain addons. <br/> This is also the same behavior as my old 'globalize-plugins' addon. <br/><br/> On load, all yellow plugins are copied over, but nothing is deleted. <br/> Folders that are no longer yellow will still remain. <br/> Even if the addon's file structure / naming changes, the outdated files and folders will remain. <br/><br/> Some addons store user data / preferences within its directory. <br/> Red and Orange addons would keep overwriting those preferences, but Yellows won't. <br/><br/> |
-#### `project-manager` 
+### `project-manager` 
 - This folder works the same as the `editor-only` folder, except the scripts run in the project manager instead of the editor.
 - The scripts should not extend `EditorPlugin` and should not use any function from `EditorInterface`, since those do not exist in the project manager.
 - There is no simple api for accessing parts of the UI. You'll have to access nodes manually like `Engine.get_main_loop().get_child(0).get_child(0)` etc.
@@ -82,92 +75,7 @@ Set the folder color by `right click > Set Folder Color...`
 
 ![image](https://github.com/user-attachments/assets/f46e63d9-a5c0-4547-b362-1952d3be5680)
 
-
-
-- All other files and directories can be ignored. They're either for testing or they handle all the globalization 
-
-## Differences from `globalize-plugins` addon
-You may be familiar with the `globalize-plugins` addon I released earlier this year. This succeeds that in a few ways:
-- dcc
-
-# Making Extensions
-> [!NOTE]
-> GitHub's tab length is 8 spaces! It doesn't look great, but since gdscript requires the use of tabs, there's not much I can do about it.<br/>
-> Just keep in mind that the code samples are a lot more compact in Godot itself.
-First and foremost, extensions are \**Editor Only*\*, so they should have `@tool`. They will not be copied into the project. If you need something included in your project, it should be an addon.
-
-## Folder
-- Extensions are just scripts in the `extensions` folder.
-- They must be in a subfolder, like `extensions/my_extension/my_script.gd`.
-- If they are directly in the `extensions` folder, for example `extensions/my_script.gd`, they will not load.
-- Also any scripts in a nested subfolder, like `extensions/my_extension/subfolder/other_script.gd`, must be manually loaded (see [Loading Resources](#loading-resources)).
-
-## Basics
-Each extension script will be instantiated once, so any functionality can be written in `_init()`. <br/>
-If your extension extends from `EditorPlugin`, it will also be added to the root of the editor. From there they work just like normal [EditorPlugins](https://docs.godotengine.org/en/stable/classes/class_editorplugin.html#class-editorplugin). 
-So you can use `_enter_tree()` instead to initialize and `_exit_tree()` to cleanup.
-This is the main use case.
-Example:
-```gdscript
-@tool
-extends EditorPlugin
-
-func _enter_tree():
-	add_tool_menu_item("Test", func(): print("Hello!"))
-
-func _exit_tree():
-	remove_tool_menu_item("Test")
-```
-## Loading Resources
-> [!WARNING]
-> Extensions are loaded from a different directory than your running project. So you cannot use `res://` paths to load anything outside the running project, you have to use absolute paths. 
-> 
-> Even with the proper absolute path, you can still only load simple resources, like an image or stylebox. <br/>
-> Anythin with subresources / dependencies will fail to load, because those paths still use `res://`. So something like PackedScene will likely fail to load.
-> 
-> This is what GDX, the script based UI framework, is for.
-
-> [!Note]
-> I've included a handy class, `Loader`, that has static variables pointing to useful absolute paths. Use this to load simple resources, like so:
-> ```gdscript
-> var image = load(Loader.global_path + "extensions/my_extension/image.png")
-> # Loader.global_path is the absolute path of the `Global Extensions` project
-> # Loader.local_path is the absolute path of the current project or 'res://'
-> ```
-
-
-## class_name
-`class_name` is handled in a special way. Normally, loading a script does not actually register the `class_name` globally. Only scripts saved in the actual project are available by their `class_name`. 
-
-To overcome this, extensions are handled differently. Instead of loading the script directly, a duplicate is loaded with extra static variables added to the bottom. These variables point to all the class_names of your extensions, letting you access them almost as if they were actually registered globally.
-
-For example this:
- ```gdscript
- @tool
- func _init():
- 	print(Loader.global_path)
- ```
-Actually gets loaded as this:
- ```gdscript
- @tool
- func _init():
- 	print(Loader.global_path)
-
- static var Loader = Engine.get_singleton("_gge_Loader")
- static var AddonImporter = Engine.get_singleton("_gge_AddonImporter")
- static var GDX = Engine.get_singleton("_gge_GDX")
- ```
-
-> [!CAUTION]
-> Because these are not real `class_name`s, Godot cannot infer their types, so avoid using `:=` with them. <br/>
-> So the following example will error, with the workaround below it:
-> ```gdscript
-> var my_path := Loader.global_path
-> # Error. Used := but Loader is not a real class_name, so Godot can't infer it
-> 
-> var my_path: String = Loader.global_path
-> # No Error. If you want it to be typed you have to type it manually
-> ```
+- All files in `_internal` can be ignored. They handle all the globalization 
 
 # GDX
 This is the UI framework. This exists specifically because extensions can't load most PackedScenes, due to subresource paths. So most of the time UI will need to be done in code. This is a lightweight framework to make that a lot easier to do. It works similar to ReactJS (gdx is a reference to jsx files)
