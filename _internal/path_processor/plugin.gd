@@ -6,14 +6,20 @@ static var global_path := ProjectSettings.globalize_path("res://")
 func _enter_tree() -> void:
 	process_all_resources()
 	resource_saved.connect(on_resource_saved)
-	var file := load("res://editor-only/testing/farm.tscn")
-	var new_path : = 'res://.processed/bundled_farm.tscn'
-	print(new_path)
-	ResourceSaver.save(file, new_path, ResourceSaver.FLAG_BUNDLE_RESOURCES)
+	scene_saved.connect(on_scene_saved)
+	#var file := load("res://editor-only/testing/farm.tscn")
+	#var new_path : = 'res://.processed/bundled_farm.tscn'
+	#print(new_path)
+	#ResourceSaver.save(file, new_path, ResourceSaver.FLAG_BUNDLE_RESOURCES)
 
 
 func _exit_tree():
 	resource_saved.disconnect(on_resource_saved)
+	scene_saved.disconnect(on_scene_saved)
+
+
+func on_scene_saved(file_path: String):
+	process_file_path(file_path)
 
  
 func on_resource_saved(resource: Resource):
@@ -46,28 +52,61 @@ func process_file_path(file_path: String):
 	if file_path.begins_with("res://editor-only/") or file_path.begins_with("res://project-manager/"):
 		if ResourceLoader.exists(file_path):
 			var file := load(file_path)
+			#print(file)
 			if file is GDScript:
 				process_script(file)
 			else:
 				process_resource(file)
 		else:
 			copy_raw_file(file_path)
-		#print("processed ", file_path)
+		print("processed ", file_path)
 
+
+func convert_path(file_path: String) -> String:
+	if file_path.begins_with("res://"):
+		return global_path.path_join(".processed").path_join(file_path.trim_prefix("res://")) 
+	return ""
 
 func copy_raw_file(file_path: String):
-	if file_path.begins_with("res://"):
-		var new_path := global_path.path_join(".processed").path_join(file_path.trim_prefix("res://")) 
+	var new_path := convert_path(file_path)
+	if new_path:
 		DirAccess.make_dir_recursive_absolute(new_path.get_base_dir())
 		DirAccess.copy_absolute(file_path, new_path)
 
 
 func process_resource(file: Resource, file_path := file.resource_path):
-	if file_path.begins_with("res://"):
-		var new_path := global_path.path_join(".processed").path_join(file_path.trim_prefix("res://"))
+	var content := FileAccess.get_file_as_string(file_path)
+	var process_path := ProjectSettings.globalize_path("res://.processed")
+	
+	var i := 0
+	while i >= 0:
+		i = content.find("\n[ext_resource ", i + 1)
+		if i < 0: break
+		
+		var path_substr := ' path="'
+		var path_start := content.find(path_substr, i) + path_substr.length()
+		var path_end := content.find('"', path_start)
+		
+		var end = content.find("]\n", i + 1)
+		var slice := content.substr(path_start, path_end - path_start)
+		if slice.begins_with("res://"):
+			slice = slice.trim_prefix("res://")
+			slice = process_path.path_join(slice)
+		content = content.erase(path_start, path_end - path_start)
+		content = content.insert(path_start, slice)
+		i = path_start + slice.length()
+	#print(content)
+	
+	var new_path := convert_path(file_path)
+	if new_path:
 		DirAccess.make_dir_recursive_absolute(new_path.get_base_dir())
-		ResourceSaver.save(file, new_path)
-
+		var fs := FileAccess.open(new_path, FileAccess.WRITE)
+		fs.store_string(content)
+		fs.close()
+		#ResourceSaver.save(file, new_path)
+	#if file_path.begins_with("res://"):
+		#var new_path := global_path.path_join(".processed").path_join(file_path.trim_prefix("res://"))
+		
 
 func process_script(file: GDScript):
 	var new_source_code: String = file.source_code
@@ -101,4 +140,8 @@ func process_script(file: GDScript):
 	 
 	var new_file := GDScript.new()
 	new_file.source_code = new_source_code
-	process_resource(new_file, file_path) 
+	var new_path := convert_path(file_path)
+	if new_path:
+		DirAccess.make_dir_recursive_absolute(new_path.get_base_dir())
+		ResourceSaver.save(new_file, new_path)
+	#process_resource(new_file, file_path) 

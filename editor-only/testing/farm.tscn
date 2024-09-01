@@ -1,9 +1,15 @@
-[gd_scene load_steps=3 format=3 uid="uid://bg7s2qnqqxlx7"]
+[gd_scene load_steps=4 format=3 uid="uid://bg7s2qnqqxlx7"]
 
 [ext_resource type="Script" path="res://editor-only/testing/farm.gd" id="1_hniyq"]
 [ext_resource type="StyleBox" uid="uid://c8s22jhsbbevg" path="res://editor-only/testing/new_style_box_flat.tres" id="2_hutkt"]
 
-[node name="Farm" type="Node2D"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4rkrm"]
+skew = Vector2(2, 0)
+
+[node name="Farm" type="Control"]
+custom_minimum_size = Vector2(10, 200)
+layout_mode = 3
+anchors_preset = 0
 script = ExtResource("1_hniyq")
 
 [node name="Control" type="Control" parent="."]
@@ -16,6 +22,7 @@ offset_bottom = 40.0
 layout_mode = 0
 offset_right = 277.0
 offset_bottom = 99.0
+color = Color(1, 0.656161, 0.663622, 1)
 
 [node name="Button" type="Button" parent="Control"]
 layout_mode = 0
@@ -23,5 +30,6 @@ offset_left = 57.0
 offset_top = 135.0
 offset_right = 65.0
 offset_bottom = 143.0
+theme_override_styles/hover = SubResource("StyleBoxFlat_4rkrm")
 theme_override_styles/normal = ExtResource("2_hutkt")
 text = "Yo there"
