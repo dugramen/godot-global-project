@@ -4,9 +4,9 @@ A framework for making true global plugins for the Godot Game Engine.
 ## Installation
 This is not an addon, but a project for you to keep on your computer. All you need to do is open this project in godot, and a script will be injected into EditorSettings. From there:
 
-- Your `editor-only` plugins are global, running in the Editor every time you open a project.
-- Your `addons` will be imported & enabled when projects load, depending on what color you assign their folders.
-- Your `project-manager` plugins will run alongside the project manager.
+- [`editor-only`](#editor-only) plugins are global, running in the Editor every time you open a project.
+- [`addons`](#addons) will be imported & enabled when projects load, depending on what color you assign their folders.
+- [`project-manager`](#project-manager) plugins will run alongside the project manager.
 
 ## Overview
 ### `editor-only`
