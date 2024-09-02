@@ -2,7 +2,7 @@
 A framework for making true global plugins for the Godot Game Engine. 
 
 ## Installation
-This is not an addon, but a project for you to keep on your computer. All you need to do is open this project in godot, and a script will be injected into EditorSettings. From there:
+This is not an addon, but a project for you to keep on your computer. All you need to do is open this project in godot, and a script will be injected into EditorSettings. The project has 3 directories, one for each type of plugin:
 
 - [`editor-only`](#editor-only) plugins are global, running in the Editor every time you open a project.
 - [`addons`](#addons) will be imported & enabled when projects load, depending on what color you assign their folders.
@@ -10,13 +10,22 @@ This is not an addon, but a project for you to keep on your computer. All you ne
 
 ## Overview
 ### `editor-only`
-In this folder you store subfolders that contain your plugin. Scripts that end with `plugin.gd` and extend `EditorPlugin` will be loaded, instantiated, and ran everytime the editor loads. But they will not be available to projects, only the editor. They work mostly the same as normal EditorPlugins, but with a few differences.
-
+In this folder you store subfolders that contain your plugin. Scripts that end with `plugin.gd` and extend `EditorPlugin` will be loaded, instantiated, and ran everytime the editor loads. 
 > As always, EditorPlugins should have `@tool` at the top of the file.
+```
+editor-only
+└── my-subfolder
+    ├── my-plugin.gd    # ✓ Automatically instantiated
+    └── my-script.gd	# x Must load manually from "my-plugin.gd"
+```
+
+They work mostly the same as normal EditorPlugins, but with a few differences. For starters, they will not be available to projects, only the editor, hence `editor-only`. 
 
 These plugins are not copied into any project, rather they are loaded directly from the global-project folder. They're not like the plugins you enable in ProjectSettings, so they don't have access to:
 - `EditorPlugin` virtual methods
 - `EditorPlugin` signals
+
+Every other function should still be available though.
 
 They're also handled in a special way when it comes to dependencies.
 
@@ -46,11 +55,14 @@ Normally when loading resources, `res://` paths can only point to the current pr
 > [!TIP]
 > The entire addon import functionality (next section) is implemented as an `editor-only` plugin in `/editor-only/included/addon-importer-plugin.gd`. You can view that code as an example.
 >
-> You'll notice that it uses a code based UI framework, [GDX](GDX.md). I made it because for most of the development, PackedScenes, and any resource with external resources, could not be loaded.
+> You'll notice that it uses a code based UI framework, [GDX](GDX.md). I made it because for most of the development, PackedScenes, or any resource with external dependencies, could not be loaded.
 > That's not the case anymore, but it's still included for convenience, and its how the included plugins render UI.
 
+> [!WARNING]
+> Every file inside the `editor-only` and `project-manager` directories will be copied into the `.processed` directory. That includes non resource files too, like raw images. So just be aware that if you store large files here, it may increase the file size and the global-project load time (all files are processed on load). Eventually raw files
+
 > [!CAUTION]
-> `class_name` will not work as expected, since these files are not stored in the current directory. Use preloads instead, which have similar intellisense. The only difference is they cannot be used as types directly.
+> `class_name` should not be declared for `editor-only` and `project-manager` scripts. Since these files won't be in a project's directory, the editor won't load the class_names into the global namespace. Use preloads instead, which have similar intellisense. The only difference is they cannot be used as types directly.
 
 ### `addons`  
 Store your normal / typical addons in this directory, even ones from the AssetLib. There are various options for how these addons should be (automatically) imported, depending on folder colors. 
