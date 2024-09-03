@@ -59,7 +59,8 @@ Normally when loading resources, `res://` paths can only point to the current pr
 > That's not the case anymore, but it's still included for convenience, and its how the included plugins render UI.
 
 > [!WARNING]
-> Every file inside the `editor-only` and `project-manager` directories will be copied into the `.processed` directory. That includes non resource files too, like raw images. So just be aware that if you store large files here, it may increase the file size and the global-project load time (all files are processed on load). Eventually raw files
+> Only resources will be copied into the `.processed` directory, since other files don't need to worry about resource dependencies. Other files might also be very large, so excluding them decreases process time and file sizes.
+> 
 
 > [!CAUTION]
 > `class_name` should not be declared for `editor-only` and `project-manager` scripts. Since these files won't be in a project's directory, the editor won't load the class_names into the global namespace. Use preloads instead, which have similar intellisense. The only difference is they cannot be used as types directly.
