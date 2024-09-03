@@ -7,7 +7,7 @@ static func _static_init():
 		"injector",
 		"path_processor"
 	]:
-		var path := plugin_path(plugin)
+		var path := plugin_path(plugin) 
 		if EditorInterface.is_plugin_enabled(path):
 			EditorInterface.set_plugin_enabled(path, false)
 		EditorInterface.set_plugin_enabled(path, true) 

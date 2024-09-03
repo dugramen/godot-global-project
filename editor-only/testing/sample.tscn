@@ -1,0 +1,46 @@
+[gd_scene load_steps=5 format=3 uid="uid://2t17xmxryol7"]
+
+[ext_resource type="Theme" uid="uid://dpgnis553xfs4" path="res://editor-only/testing/new_theme.tres" id="1_4tcae"]
+[ext_resource type="Script" path="res://editor-only/testing/sample.gd" id="1_onld7"]
+[ext_resource type="LabelSettings" uid="uid://cs323n6mdcfsx" path="res://editor-only/testing/new_label_settings.tres" id="2_n1rtw"]
+[ext_resource type="Texture2D" uid="uid://5aitrahgygwo" path="res://editor-only/testing/static/icon.svg" id="3_f1chp"]
+
+[node name="Sample" type="MarginContainer"]
+custom_minimum_size = Vector2(0, 200)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_4tcae")
+script = ExtResource("1_onld7")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "This is my button"
+
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+texture = ExtResource("3_f1chp")
+
+[node name="Button2" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "This is my button"
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Label"
+label_settings = ExtResource("2_n1rtw")
+
+[node name="TextEdit" type="TextEdit" parent="VBoxContainer"]
+layout_mode = 2
+placeholder_text = "A lot of text in here"
+scroll_fit_content_height = true
+
+[node name="Button3" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "This is my button"
