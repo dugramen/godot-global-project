@@ -31,8 +31,8 @@ They're also handled in a special way when it comes to dependencies.
 
 Normally when loading resources, `res://` paths can only point to the current project's directory. To load global-project files, they must use absolute paths. The editor makes that very hard to do, so I've come up with a way to automatically convert them.
 
-- When the global-project loads, or when a resource is saved, any file in the `editor-only` or `project-manager` directory will be copied & processed into the `.processed` folder (hidden from the editor).
-- The processed files have their paths converted to absolute paths, pointing to other files in the `.processed` directory.
+- When the global-project loads or saves, any resource in the `editor-only` or `project-manager` directory will be copied & processed into the `.processed` folder (hidden from the editor).
+- The processed resources have their paths converted to absolute paths, pointing to other files in the `.processed` directory.
 - For non-script resources, including `PackedScene`, all external resource paths are converted to absolute. This should cover most cases, but please report an issue if it doesn't. Built-in scripts might not work as expected, so avoid them for now.
 - For scripts, only their ***preload paths*** are converted to paths in the global-project. 
 	```gdscript
