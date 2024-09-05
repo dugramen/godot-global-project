@@ -1,9 +1,9 @@
 [gd_scene load_steps=5 format=3 uid="uid://2t17xmxryol7"]
 
-[ext_resource type="Theme" uid="uid://dpgnis553xfs4" path="res://editor-only/testing/new_theme.tres" id="1_4tcae"]
-[ext_resource type="Script" path="res://editor-only/testing/sample.gd" id="1_onld7"]
-[ext_resource type="LabelSettings" uid="uid://cs323n6mdcfsx" path="res://editor-only/testing/new_label_settings.tres" id="2_n1rtw"]
-[ext_resource type="Texture2D" uid="uid://5aitrahgygwo" path="res://editor-only/testing/static/icon.svg" id="3_f1chp"]
+[ext_resource type="Theme" uid="uid://dpgnis553xfs4" path="C:/godot/global-project/editor-only/testing/new_theme.tres" id="1_4tcae"]
+[ext_resource type="Script" path="C:/godot/global-project/editor-only/testing/sample.gd" id="1_onld7"]
+[ext_resource type="LabelSettings" uid="uid://cs323n6mdcfsx" path="C:/godot/global-project/editor-only/testing/new_label_settings.tres" id="2_n1rtw"]
+[ext_resource type="Texture2D" uid="uid://5aitrahgygwo" path="C:/godot/global-project/editor-only/testing/icon.svg" id="3_f1chp"]
 
 [node name="Sample" type="MarginContainer"]
 custom_minimum_size = Vector2(0, 200)
