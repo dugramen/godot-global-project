@@ -88,20 +88,20 @@ Set the folder color by `right click > Set Folder Color...`
 ## `project-manager` 
 - This folder works the same as the `editor-only` folder, except the scripts run in the project manager instead of the editor.
 - The scripts should not extend `EditorPlugin` and should not use any function from `EditorInterface`, since those do not exist in the project manager. But they should still end with `plugin.gd`
-- There is no simple api for accessing parts of the UI. You'll have to access nodes manually, but you shouldn't rely on `NodePaths`, as node names have random generated numbers in them. Use index based paths instead, like `Engine.get_main_loop().get_child(0).get_child(0)`, or recursively search the tree with `String.match()`
+- There is no simple api for accessing parts of the UI. You'll have to access nodes manually, but you shouldn't rely on `NodePaths`, as node names have random generated numbers in them. Use index based paths instead, like `Engine.get_main_loop().get_child(0).get_child(0)`, or recursively search the tree and use `String.match()`
 - I have created and included a `project-manager` plugin that adds an `inspect` button to the top right, to help you find the node in the SceneTree structure.
 
-![image](https://github.com/user-attachments/assets/c7e52e24-6f0d-4289-849b-ab0a908ba702)
+![image](https://github.com/user-attachments/assets/be0a8d6a-8706-4f1f-b171-3e0de38ab4cb)
 
 - This pops up a window that lets you view the project manager's scene tree. On the right is the selected node's property list.
 
-![image](https://github.com/user-attachments/assets/3ded6864-c9b5-4e04-99c2-551d3097a4bf)
+![image](https://github.com/user-attachments/assets/47a26e6c-5b27-47c3-8b4d-f8a0f2267911)
 
-- When you've pressed `inspect`, you can also click directly on a node to view it in the tree. The hovered node will be highlighted in red.
+- If you click `Pick from UI`, you can click directly in the UI to pick a node. The hovered node will be highlighted in red.
 
-![image](https://github.com/user-attachments/assets/f46e63d9-a5c0-4547-b362-1952d3be5680)
+![image](https://github.com/user-attachments/assets/9e684d0b-0447-4c43-8e9b-542a76685f48)
 
-- All files in `_internal` can be ignored. They handle all the globalization 
+<!-- - All files in `_internal` can be ignored. They handle all the globalization -->
 
 ## Troubleshooting
 Since editor-only and project-manager plugins load alongside the editor, if one of them is bugged, the editor may crash. To fix this:
