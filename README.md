@@ -33,7 +33,7 @@ They're also handled in a special way when it comes to dependencies. Normally wh
 When the global-project loads or saves, any resource in the `editor-only` or `project-manager` directory will be copied & processed into the `.processed` folder (hidden from the editor).
 
 The processed files have their paths converted to absolute, pointing to other files in the `.processed` directory. It works slightly different depending on whether its a script, a normal resource, or an imported resource:
-- Normal resources endinig in `.tres` or `.tscn`, aka `PackedScenes`, are copied into the `.processed` folder, and their `ext_resource` paths are converted.
+- Normal resources ending in `.tres` or `.tscn`, are copied into the `.processed` folder, and their `ext_resource` paths are converted.
 - For imported resources, the raw resource will not be touched. However, the `.import` file will be copied into the `.processed` folder, and its paths will be converted.
 - For scripts ending in `.gd`, their `preload` paths are converted. 
 	```gdscript
