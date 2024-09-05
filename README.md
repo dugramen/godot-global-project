@@ -8,8 +8,7 @@ This is not an addon, but a project for you to keep on your computer. All you ne
 - [`addons`](#addons) will be imported & enabled when projects load, depending on what color you assign their folders.
 - [`project-manager`](#project-manager) plugins will run alongside the project manager.
 
-## Overview
-### `editor-only`
+## `editor-only`
 In this folder you store subfolders that contain your plugin. Scripts that end with `plugin.gd` and extend `EditorPlugin` will be loaded, instantiated, and ran everytime the editor loads. 
 > As always, EditorPlugins should have `@tool` at the top of the file.
 ```
@@ -27,29 +26,33 @@ These plugins are not copied into any project, rather they are loaded directly f
 
 Every other function should still be available though.
 
-They're also handled in a special way when it comes to dependencies.
+### Dependencies
 
-Normally when loading resources, `res://` paths can only point to the current project's directory. To load global-project files, they must use absolute paths. The editor makes that very hard to do, so I've come up with a way to automatically convert them.
+They're also handled in a special way when it comes to dependencies. Normally when loading resources, `res://` paths can only point to the current project's directory. To load global-project files, they must use absolute paths. The editor makes that very hard to do, so I've come up with a way to automatically convert them.
 
-- When the global-project loads, or when a resource is saved, any file in the `editor-only` or `project-manager` directory will be copied & processed into the `.processed` folder (hidden from the editor).
-- The processed files have their paths converted to absolute paths, pointing to other files in the `.processed` directory.
-- For non-script resources, including `PackedScene`, all external resource paths are converted to absolute. This should cover most cases, but please report an issue if it doesn't. Built-in scripts might not work as expected, so avoid them for now.
-- For scripts, only their ***preload paths*** are converted to paths in the global-project. 
+When the global-project loads or saves, any resource in the `editor-only` or `project-manager` directory will be copied & processed into the `.processed` folder (hidden from the editor).
+
+The processed files have their paths converted to absolute, pointing to other files in the `.processed` directory. It works slightly different depending on whether its a script, a normal resource, or an imported resource:
+- Normal resources endinig in `.tres` or `.tscn`, aka `PackedScenes`, are copied into the `.processed` folder, and their `ext_resource` paths are converted.
+- For imported resources, the raw resource will not be touched. However, the `.import` file will be copied into the `.processed` folder, and its paths will be converted.
+- For scripts ending in `.gd`, their `preload` paths are converted. 
 	```gdscript
 	# This
 	var my_res_file := preload("res://editor-only/my-plugin/my-file.gd")
 	# Becomes something like this
 	var my_abs_file := preload("D:/Godot/global-project//editor-only/my-plugin/my-file.gd")
 	```
-- If you want direct access to the global-project path in a variable or something, you can preload the included `paths.gd` script like so
+- If you want to load manually, you can get direct access to the global-project path by preloading the included `paths.gd` script like so
   ```gdscript
   var Paths := preload("res://editor-only/included/paths.gd")
   
   # Paths.global is the global-project path
-  var my_path := Paths.global + "/my_path"
+  var my_file_path := Paths.global + "/my_file.txt"
+  var some_file = FileAccess.open(my_file_path, FileAccess.READ)
   
   # Paths.processed is where the processed files are stored
-  var my_processed_path := Paths.processed + "/my_path"
+  var my_resource_path := Paths.processed + "/my_resource.tres"
+  var some_res = load(my_resource_path)
   ```
 
 > [!TIP]
@@ -59,13 +62,16 @@ Normally when loading resources, `res://` paths can only point to the current pr
 > That's not the case anymore, but it's still included for convenience, and its how the included plugins render UI.
 
 > [!WARNING]
-> Only resources will be copied into the `.processed` directory, since other files don't need to worry about resource dependencies. Other files might also be very large, so excluding them decreases process time and file sizes.
-> 
+> Binary resources, files ending in `.res` and `.scn`, won't be processed. Since they're not stored as text they can't be easily converted.
+>
+> Imported resources, like `icon.svg`, have an accompanying `.import` file. Only the `.import` will be converted and saved into the `.processed` folder. So when manually loading an asset, if you want to load it as a resource, use `Paths.processed`. But if you want the raw asset, use `Paths.global`.
 
 > [!CAUTION]
 > `class_name` should not be declared for `editor-only` and `project-manager` scripts. Since these files won't be in a project's directory, the editor won't load the class_names into the global namespace. Use preloads instead, which have similar intellisense. The only difference is they cannot be used as types directly.
+>
+> Built-in scripts with dependencies are also not supported, since currently it relies on the file extension to decide how to process the file. Built-in scripts are embedded in `.tres` or `.tscn` files, so they won't get processed like `.gd` scripts. Simple isolated scripts should still work though.
 
-### `addons`  
+## `addons`  
 Store your normal / typical addons in this directory, even ones from the AssetLib. There are various options for how these addons should be (automatically) imported, depending on folder colors. 
 Set the folder color by `right click > Set Folder Color...`
 
@@ -78,7 +84,8 @@ Set the folder color by `right click > Set Folder Color...`
 | 🔴 Red | <br/> This is ideal if you're developing & testing your own addons locally. <br/> Red addons are synced exactly as they appear in the global project. <br/><br/> On load, they are deleted, and then copied over again. <br/> This means if addons are no longer Red in the global project, they will no longer exist in your other projects. <br/><br/> |
 | 🟠 Orange | <br/> This is recommended for asset store addons. <br/><br/> Only when the version in plugin.cfg has changed, the addons are deleted, then copied over. <br/> Addons that are no longer Orange will also be deleted. <br/><br/> This method makes it so files aren't copied over every time. <br/><br/> |
 | 🟡 Yellow | <br/> This is for compatability with certain addons. <br/> This is also the same behavior as my old 'globalize-plugins' addon. <br/><br/> On load, all yellow plugins are copied over, but nothing is deleted. <br/> Folders that are no longer yellow will still remain. <br/> Even if the addon's file structure / naming changes, the outdated files and folders will remain. <br/><br/> Some addons store user data / preferences within its directory. <br/> Red and Orange addons would keep overwriting those preferences, but Yellows won't. <br/><br/> |
-### `project-manager` 
+
+## `project-manager` 
 - This folder works the same as the `editor-only` folder, except the scripts run in the project manager instead of the editor.
 - The scripts should not extend `EditorPlugin` and should not use any function from `EditorInterface`, since those do not exist in the project manager. But they should still end with `plugin.gd`
 - There is no simple api for accessing parts of the UI. You'll have to access nodes manually, but you shouldn't rely on `NodePaths`, as node names have random generated numbers in them. Use index based paths instead, like `Engine.get_main_loop().get_child(0).get_child(0)`, or recursively search the tree with `String.match()`
