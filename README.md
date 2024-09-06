@@ -75,7 +75,8 @@ The processed files have their paths converted to absolute, pointing to other fi
 Store your normal / typical addons in this directory, even ones from the AssetLib. There are various options for how these addons should be (automatically) imported, depending on folder colors. 
 Set the folder color by `right click > Set Folder Color...`
 
-![image](https://github.com/user-attachments/assets/5bf497ea-6b22-4b07-ba2c-92e4025471c1)
+![image](https://github.com/user-attachments/assets/0c10e6f9-49f2-4e5b-bd52-8ea9f3d61aa6)
+
 
 
 | Folder_Color | Behavior |
