@@ -40,7 +40,7 @@ func handle_menu_popup():
 						Project > Tools > Addon Importer
 					",
 					"": "",
-					"Red - Exact": "
+					"Red --- Refresh": "
 						Red addons are synced exactly as they appear in the global project.
 						
 						On load, they are deleted, and then copied over again.
@@ -49,7 +49,7 @@ func handle_menu_popup():
 						
 						This is ideal if you're developing & testing your own addons locally.
 					", 
-					"Orange - Versioning": "
+					"Orange --- Refresh Versioned": "
 						This is recommended for asset store addons.
 						
 						Only when the version in plugin.cfg has changed,
@@ -58,7 +58,7 @@ func handle_menu_popup():
 						
 						This method makes it so files aren't copied everytime.
 					",
-					"Yellow - Basic Copy": "
+					"Yellow --- Update": "
 						This is the same behavior as my old 'globalize-plugins' addon.
 						
 						On load, all yellow plugins are copied over. Nothing is deleted.
@@ -67,6 +67,12 @@ func handle_menu_popup():
 						
 						Some addons store user data / preferences within its directory.
 						Red and Orange addons will overwrite those, but Yellow addons won't.
+					",
+					"Green --- Update Versioned": "
+						This is the same as Yellow, but only copying when the version has changed.
+						
+						No files or directories will be removed.
+						Addons whose colors have changed or were deleted will remain in projects.
 					",
 				}
 				var i := 0

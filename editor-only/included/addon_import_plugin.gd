@@ -5,6 +5,7 @@ var gdx := preload('res://editor-only/included/gdx.gd').new()
 var Paths := preload("res://editor-only/included/paths.gd") 
 
 func delete_directory(path: String):
+	print('deleting ', path)
 	for dir_name in DirAccess.get_directories_at(path):
 		delete_directory(path.path_join(dir_name))
 	
@@ -14,17 +15,12 @@ func delete_directory(path: String):
 	DirAccess.remove_absolute(path) 
 
 func import_by_colors():
-	#var folder_colors: Dictionary = ProjectSettings.get_setting("file_customization/folder_colors", {})
 	var project_settings := ConfigFile.new()
 	project_settings.load(Paths.global.path_join("project.godot"))
 	var folder_colors: Dictionary = project_settings.get_value("file_customization", "folder_colors", {})
-	#print(folder_colors)
-	
-	#var file_extension := '.global-red'
 	
 	var rfs := EditorInterface.get_resource_filesystem()
 	while rfs.is_scanning():
-		#print('is scanning')
 		await get_tree().process_frame
 	
 	var plugins_to_enable := []
@@ -33,30 +29,30 @@ func import_by_colors():
 	# Delete reds and oranges
 	DirAccess.make_dir_absolute(Paths.local.path_join("addons"))
 	for dir_name in DirAccess.get_directories_at("res://addons"):
-		var path := "res://addons".path_join(dir_name)
+		var path := "res://addons".path_join(dir_name) + "/"
 		var plugin_path := path.path_join("plugin.cfg")
+		
 		if FileAccess.file_exists(plugin_path):
 			plugin_exist_map[plugin_path] = true
 			EditorInterface.set_plugin_enabled(plugin_path, false)
-			#plugins_to_enable.push_back(path.path_join("plugin.cfg"))
+		
 		if FileAccess.file_exists(path.path_join(".global-red")):
-			#print('deleting ', dir_name)
 			delete_directory(Paths.local.path_join("addons").path_join(dir_name))
+		
 		elif FileAccess.file_exists(path.path_join(".global-orange")):
-			#print('deleting ', dir_name)
-			delete_directory(Paths.local.path_join("addons").path_join(dir_name))
+			if folder_colors.get(path, "") != "orange":
+				delete_directory(Paths.local.path_join("addons").path_join(dir_name))
 	
 	for addon_path in DirAccess.get_directories_at(Paths.global.path_join("addons")):
 		var res_path := "res://addons".path_join(addon_path)
 		var color = folder_colors.get(res_path + '/')
-		#prints(res_path, color, res_path.path_join(file_extension))
 		
-		if color not in ["red", "orange"]:
+		# Default no color
+		if color == null:
 			continue
-		if color == "red":
-			DirAccess.make_dir_recursive_absolute(res_path)
-			FileAccess.open(res_path.path_join(".global-red"), FileAccess.WRITE)
-		elif color == "orange":
+		
+		# Versioned
+		if color in ["orange", "green"]:
 			var res_cfg_path := res_path.path_join("plugin.cfg")
 			var glb_cfg_path := Paths.global.path_join("addons").path_join(addon_path).path_join("plugin.cfg")
 			if FileAccess.file_exists(res_cfg_path) and FileAccess.file_exists(glb_cfg_path):
@@ -67,22 +63,13 @@ func import_by_colors():
 				nfg.load(glb_cfg_path)
 				var new_version = nfg.get_value("plugin", "version", "")
 				
-				#print(Paths.global.path_join("addons").path_join(addon_path))
-				#print("versions : ", [old_version, new_version])
 				if old_version == new_version:
-					print("Versions match. Skipping copy")
+					print("Versions match. Skipping ", addon_path)
 					continue
-				#var new_version = 
-			
-			DirAccess.make_dir_recursive_absolute(res_path)
-			FileAccess.open(res_path.path_join(".global_orange"), FileAccess.WRITE)
-			#print(FileAccess.get_open_error())
-			#var tracker_file := ConfigFile.new()
-			#
-			#print(tracker_file.save(res_path.path_join(file_extension)))
-			#print("saved global red")
 		
-		#print('copying ', addon_path)
+		# Make dummy .global-color file for tracking
+		DirAccess.make_dir_recursive_absolute(res_path)
+		FileAccess.open(res_path.path_join(".global-" + color), FileAccess.WRITE)
 		
 		var plugin_path := res_path.path_join("plugin.cfg")
 		if FileAccess.file_exists(plugin_path):
@@ -119,26 +106,15 @@ func import_by_colors():
 	popup.popup_centered()
 	
 	rfs.scan_sources()
-	#rfs.scan()
 	while rfs.is_scanning():
-		#print('is scanning')
 		await get_tree().process_frame
-	
-	#await get_tree().create_timer(3).timeout
-	
-	#for plugin in plugins_to_enable:
-		#EditorInterface.set_plugin_enabled(plugin, true)
 	
 	for dir_name in DirAccess.get_directories_at("res://addons"):
 		var cfg_path := "res://addons".path_join(dir_name).path_join("plugin.cfg")
-		#if plugin_exist_map.has(cfg_path): continue
 		if FileAccess.file_exists(cfg_path):
 			EditorInterface.set_plugin_enabled(cfg_path, true)
-			#if !EditorInterface.is_plugin_enabled(cfg_path):
-		else:
-			## Create a plugin for each EditorPlugin gdscript file
-			pass
 	popup.hide()
+
 
 func copy_addons(addons: Array):
 	var plugin_folders_to_enable := []
@@ -160,6 +136,8 @@ func copy_addons(addons: Array):
 		
 		# Check if the plugin already exists in the project
 		var already_exists := FileAccess.file_exists("res://addons/" + addon + "/" + "plugin.cfg")
+		if EditorInterface.is_plugin_enabled(addon):
+			EditorInterface.set_plugin_enabled(addon, false)
 		
 		# Recursively copy the folder contents into this project
 		var dirs := [addon]
@@ -178,8 +156,9 @@ func copy_addons(addons: Array):
 				dirs.append(dir + '/' + d)
 			i += 1
 			
-			if !already_exists:
-				plugin_folders_to_enable.push_back(addon)
+			plugin_folders_to_enable.push_back(addon)
+			#if !already_exists:
+				#plugin_folders_to_enable.push_back(addon)
 		
 	# The FileSystem dock doesn't properly scan new files if scanned immediately
 	#rfs.scan()

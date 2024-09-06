@@ -40,13 +40,13 @@ static func init_extensions(loader_path: String, this_file: GDScript) -> void:
 						paths.push_back(path.path_join(dir_name))
 					for file_name in DirAccess.get_files_at(global_path.path_join(path)):
 						var file_path := global_path.path_join(path).path_join(file_name)
-						print(file_path)
+						#print(file_path)
 						if file_name.ends_with("plugin.gd"):
 							var file = load(file_path)
 							if file is GDScript:
 								instantiate_plugin(file)
 			else:
-				print("project manager?")
+				#print("project manager?")
 				var root: Node = main_loop.root
 				var paths := [global_path.path_join(".processed/project-manager")]
 				while !paths.is_empty():
@@ -59,7 +59,7 @@ static func init_extensions(loader_path: String, this_file: GDScript) -> void:
 							var file = load(file_path)
 							if file is GDScript:
 								var instance: Object = file.new()
-								prints('project plugin ', file, instance)
+								#prints('project plugin ', file, instance)
 								if instance is Node:
 									root.add_child(instance)
 		, CONNECT_ONE_SHOT)
