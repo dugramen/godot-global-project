@@ -1,6 +1,7 @@
 extends Control
 
 var gdx := preload("res://editor-only/included/gdx.gd").new()
+var helpers := preload("res://project-manager/inspect/helpers.gd")
 
 var topmost_node: Control
 var hovered_nodes := {}
@@ -47,6 +48,9 @@ var inspecting := false:
 func _enter_tree() -> void:
 	print("I was spawned")  
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	print("extracting")
+	print(helpers.extract_node([0, 1, 0, 0]))
+	print(helpers.extract_node([0, "*EditorAbout*"]))
 	#mouse_filter = MOUSE_FILTER_PASS
 	
 	var root: Node = get_parent()
@@ -64,7 +68,7 @@ func _enter_tree() -> void:
 	inspect_button.icon = get_theme_icon("FileTree", "EditorIcons")
 	inspect_button.text = "Inspect"
 	var button_parent: Node = root.get_child(0, true).get_child(1, true).get_child(0, true).get_child(0, true).get_child(2, true)
-	print(button_parent)
+	#print(button_parent)
 	button_parent.add_child(inspect_button)
 	button_parent.move_child(inspect_button, 0)
 	inspect_button.pressed.connect(
@@ -123,8 +127,9 @@ func _enter_tree() -> void:
 												disabled = true if item.get_child_count(true) == 0 else false,
 												#alignment = HORIZONTAL_ALIGNMENT_LEFT,
 												toggle_mode = true,
-												on_toggled = func(val):
-													item.set_meta('expanded', val)
+												on_pressed = func(val = false):
+													item.set_meta("expanded", !item.get_meta("expanded", false))
+													#item.set_meta('expanded', val)
 													#item.set_meta('expanded', !item.get_meta('expanded', false))
 													gdx.render()
 													pass,
@@ -224,6 +229,22 @@ func _enter_tree() -> void:
 						[
 							[Label, {
 								text = inspected_node.name
+							}],
+							[Button, {
+								text = "Copy Path as Index Array",
+								icon = get_theme_icon("ActionCopy", "EditorIcons"),
+								on_pressed = func():
+									#var list := str(inspected_node.get_path()).split("/", false)
+									#var index_list := []
+									var list := []
+									var node := inspected_node
+									while node != root:
+										list.push_back(node.get_index())
+										node = node.get_parent()
+									list.reverse()
+									DisplayServer.clipboard_set(str(list))
+									print(list)
+									pass,
 							}],
 							[Label, {
 								text = str(inspected_node.get_path()),
