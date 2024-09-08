@@ -11,7 +11,7 @@ This is not an addon, but a project for you to keep on your computer. All you ne
 There's a 4th `_internal` folder, where all the code that makes the project work is stored. It can be ignored.
 
 ## `editor-only`
-In this folder you store subfolders that contain your plugin. Scripts that end with `plugin.gd` and extend `EditorPlugin` will be loaded, instantiated, and ran everytime the editor loads. 
+In this directory you store subfolders that contain your plugin. Scripts that end with `plugin.gd` and extend `EditorPlugin` will be loaded, instantiated, and ran everytime the editor loads. 
 > As always, EditorPlugins should have `@tool` at the top of the file.
 ```
 editor-only
