@@ -38,3 +38,14 @@ static func extract_node(arr: Array, root := engine_root, include_internal := tr
 			current_node = next_node
 	
 	return current_node
+
+static func create_project(path: String) -> String:
+	if !path.ends_with("project.godot"):
+		path = path.path_join("project.godot")
+	DirAccess.make_dir_recursive_absolute(path.get_base_dir())
+	var cfg := ConfigFile.new()
+	cfg.save(path)
+	return path
+
+#static func cli():
+	#OS.create_instance(["C:/poo", "-e", "--editor"])
