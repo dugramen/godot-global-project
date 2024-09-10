@@ -1,10 +1,14 @@
 @tool
 
 static var engine_root: Node = Engine.get_main_loop().root
+static var path_cache := {}
 
-static func extract_node(arr: Array, root := engine_root, include_internal := true):
+static func extract_node(arr: Array, root := engine_root, include_internal := true, use_cache := true) -> Node:
 	var current_node := root
 	var next_node: Node = null
+	
+	if use_cache and arr in path_cache:
+		return path_cache[arr]
 	
 	for item in arr:
 		next_node = null
@@ -36,6 +40,9 @@ static func extract_node(arr: Array, root := engine_root, include_internal := tr
 			return null
 		else:
 			current_node = next_node
+	
+	if use_cache:
+		path_cache[arr] = current_node
 	
 	return current_node
 
