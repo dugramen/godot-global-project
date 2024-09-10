@@ -42,6 +42,8 @@ static func extract_node(arr: Array, root := engine_root, include_internal := tr
 static func create_project(path: String) -> String:
 	if !path.ends_with("project.godot"):
 		path = path.path_join("project.godot")
+	if FileAccess.file_exists(path):
+		return path
 	DirAccess.make_dir_recursive_absolute(path.get_base_dir())
 	var cfg := ConfigFile.new()
 	cfg.save(path)
